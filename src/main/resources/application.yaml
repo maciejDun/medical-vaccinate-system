@@ -6,3 +6,22 @@ spring:
           google:
             client-id: 321715938529-d28hk3rco0qtbt9dj5prqlro0mtpuo1i.apps.googleusercontent.com
             client-secret: OslwGiyTAQle-fRNZ-5LNxDn
+  datasource:
+    url: jdbc:postgresql://localhost:5432/vaccinate
+    username: user
+    password: password
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          lob:
+            non_contextual_creation: true
+    show-sql: true
+  jackson:
+    default-property-inclusion: always
+    serialization:
+      indent_output: true
+      write-dates-as-timestamps: false
+  flyway:
+    locations: classpath:/flyway
