@@ -1,7 +1,9 @@
 package com.dunin.medicalvaccinatesystem.testController;
 
-import com.dunin.medicalvaccinatesystem.oauthService.IAuthenticationFacade;
+import com.dunin.medicalvaccinatesystem.security.oauthService.JwtMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -9,28 +11,24 @@ import org.springframework.web.bind.annotation.RestController;
 public class TestController {
 
     @Autowired
-    private IAuthenticationFacade authenticationFacade;
+    private JwtMapper jwtMapper;
 
 
     @GetMapping("/google")
     public String returnTest() {
-//        String authorities =
-//                authenticationFacade.getAuthentication().getName();
+        return "Hello you successfully logged in using Google account id: ";
 
-        return "Hello you successfully logged in using Google account id: " +
-                authenticationFacade.getAuthentication().getName();
+
     }
 
     @GetMapping("admin")
     public String returnAdmin() {
-        return "hello admin " +
-                authenticationFacade.getAuthentication().getName();
+        return "hello admin ";
     }
 
     @GetMapping("/")
     public String returnHome() {
-        return "Welcome to the vaccination registration system " +
-                authenticationFacade.getAuthentication().getName();
+        return "Welcome to the vaccination registration system ";
     }
 
 }
