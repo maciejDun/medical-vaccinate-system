@@ -1,4 +1,4 @@
-package com.dunin.medicalvaccinatesystem.security.oauthService;
+package com.dunin.medicalvaccinatesystem.security.oauth.model;
 
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;
@@ -26,7 +26,7 @@ public class CustomOAuth2User implements OAuth2User {
 
     @Override
     public String getName() {
-        return oAuth2User.getName();
+        return oAuth2User.getAttribute("name");
     }
 
     public String getEmail() {
