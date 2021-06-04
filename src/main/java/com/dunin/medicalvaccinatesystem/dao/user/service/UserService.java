@@ -36,9 +36,7 @@ public class UserService {
 
     public boolean checkIfAdmin(Optional<UserEntity> userExists) {
         Roles role = userExists.get().getRoles();
-        if (role.equals(Roles.ROLE_ADMIN)) return true;
-        return false;
+        return (role.equals(Roles.ROLE_ADMIN));
     }
-
 }
 

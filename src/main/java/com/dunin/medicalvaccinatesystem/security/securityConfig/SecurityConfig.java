@@ -24,8 +24,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-            .antMatchers("/admin").hasRole("ADMIN")
-            .antMatchers("/google").hasAnyRole("ADMIN", "USER")
+            .antMatchers("/admin**").hasRole("ADMIN")
+            .antMatchers("/google/**").hasAnyRole("ADMIN", "USER")
             .and()
             .oauth2Login()
             .userInfoEndpoint()
