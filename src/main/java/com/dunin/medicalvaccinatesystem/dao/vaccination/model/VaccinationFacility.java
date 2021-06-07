@@ -9,9 +9,9 @@ import javax.persistence.*;
 @Data
 public class VaccinationFacility {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)
-    private Integer id;
+    private Long id;
     private String country;
     private String state;
     private String city;

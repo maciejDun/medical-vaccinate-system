@@ -11,9 +11,9 @@ import javax.persistence.*;
 public class VaccinatedUser {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)
-    private Integer id;
+    private Long id;
     @OneToOne
     private UserEntity userEntity;
     @OneToOne

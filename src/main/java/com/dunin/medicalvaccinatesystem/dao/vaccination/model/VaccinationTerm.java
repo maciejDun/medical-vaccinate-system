@@ -10,9 +10,9 @@ import java.time.LocalDateTime;
 @Data
 public class VaccinationTerm {
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)
-    private Integer id;
+    private Long id;
     private LocalDateTime vaccinationDate;
     private LocalDateTime creationDate;
     @ManyToOne

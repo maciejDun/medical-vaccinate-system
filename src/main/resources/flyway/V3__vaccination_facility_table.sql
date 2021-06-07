@@ -1,5 +1,3 @@
-CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
-
 CREATE TABLE vaccination_facility
 (
     id      BIGSERIAL PRIMARY KEY,
