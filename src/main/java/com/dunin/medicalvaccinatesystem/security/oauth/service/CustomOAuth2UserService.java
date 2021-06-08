@@ -1,6 +1,6 @@
 package com.dunin.medicalvaccinatesystem.security.oauth.service;
 
-import com.dunin.medicalvaccinatesystem.dao.user.service.UserService;
+import com.dunin.medicalvaccinatesystem.buissnessService.UserService;
 import com.dunin.medicalvaccinatesystem.model.roles.Roles;
 import com.dunin.medicalvaccinatesystem.security.oauth.model.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +22,6 @@ import java.util.List;
 public class CustomOAuth2UserService extends DefaultOAuth2UserService {
 
     private final UserService userService;
-    private final OAuth2AttributeExtractor oAuth2AttributeExtractor;
     private final SecurityContextService securityContextService;
 
     @Override
@@ -32,12 +31,11 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     public void processOAuthPostLogin() {
-        String userEmail = oAuth2AttributeExtractor.getEmail();
-        checkIfAdmin(userEmail);
+        checkIfAdmin();
     }
 
-    public void checkIfAdmin(String userEmail) {
-        if (userService.processOAuthPostLogin(userEmail)) grantAdminAuthorities();
+    public void checkIfAdmin() {
+        if (userService.processOAuthPostLogin()) grantAdminAuthorities();
     }
 
     private void grantAdminAuthorities() {

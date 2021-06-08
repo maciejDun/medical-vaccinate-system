@@ -1,25 +1,26 @@
-package com.dunin.medicalvaccinatesystem.dao.user.model;
+package com.dunin.medicalvaccinatesystem.dao.vaccination.model;
 
-import com.dunin.medicalvaccinatesystem.model.roles.Roles;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
-@Data
 @Entity
-@Table(name = "users")
-@NoArgsConstructor
+@Table(name = "vaccination_term")
+@Data
 @AllArgsConstructor
+@NoArgsConstructor
 @Builder
-public class UserEntity {
+public class TermEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)
     private Long id;
-    private String userName;
-    @Enumerated(EnumType.STRING)
-    private Roles roles;
+    private LocalDateTime vaccinationDate;
+    private LocalDateTime creationDate;
+    @ManyToOne
+    private FacilityEntity facilityEntity;
 }
