@@ -1,4 +1,4 @@
-INSERT INTO vaccination_term(vaccination_date, vaccination_facility_id)
+INSERT INTO vaccination_term(vaccination_date, facility_entity_id)
 VALUES ('2021-08-11 07:00', 1),
        ('2021-08-11 07:15', 1),
        ('2021-08-11 07:30', 1),

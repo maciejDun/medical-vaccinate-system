@@ -1,14 +1,11 @@
 package com.dunin.medicalvaccinatesystem.rest;
 
 import com.dunin.medicalvaccinatesystem.buissnessService.VaccinationService;
-import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUser;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.model.restModel.Term;
 import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeExtractor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -23,7 +20,7 @@ public class UserController {
     private final VaccinationService vaccinationService;
 
     @GetMapping("")
-    public String returnTest() {
+    public String returnWelcome() {
         return "Hello you successfully logged in using Google account id: "
                 + oAuth2AttributeExtractor.getEmail();
     }
@@ -38,8 +35,14 @@ public class UserController {
         return vaccinationService.returnOneTerm(termId);
     }
 
-    @GetMapping("/terms/{termID}/register")
-    public VaccinatedUser registerVaccUser(@PathVariable Long termID) {
+    @GetMapping("/terms/register/{termID}")
+    public VaccinatedUserEntity registerVaccUser(@PathVariable Long termID) {
         return vaccinationService.registerVaccUser(termID);
+    }
+
+    @DeleteMapping("/terms/unregister")
+    public String unregisterUser() {
+        vaccinationService.unregisterUser();
+        return "You have been successfully unregistered";
     }
 }

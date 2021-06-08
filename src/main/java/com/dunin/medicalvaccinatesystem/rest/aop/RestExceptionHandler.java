@@ -1,6 +1,6 @@
 package com.dunin.medicalvaccinatesystem.rest.aop;
 
-import com.dunin.medicalvaccinatesystem.common.exception.TermNotFoundException;
+import com.dunin.medicalvaccinatesystem.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -13,7 +13,22 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 public class RestExceptionHandler {
 
     @ExceptionHandler(TermNotFoundException.class)
-    ResponseEntity<Problem> handleNotFound(TermNotFoundException exception) {
+    ResponseEntity<Problem> handleTermNotFound(TermNotFoundException exception) {
+        return handleException(exception, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(TermAlreadyTakenException.class)
+    ResponseEntity<Problem> handleTermAlreadyTaken(TermAlreadyTakenException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserAlreadyRegisteredException.class)
+    ResponseEntity<Problem> handleAlreadyRegistered(UserAlreadyRegisteredException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(VaccinatedUserNotFoundException.class)
+    ResponseEntity<Problem> handleUserNotFound(VaccinatedUserNotFoundException exception) {
         return handleException(exception, HttpStatus.NOT_FOUND);
     }
 

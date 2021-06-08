@@ -1,6 +1,9 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.model;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -8,7 +11,10 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "vaccination_term")
 @Data
-public class VaccinationTerm {
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
+public class TermEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)
@@ -16,5 +22,5 @@ public class VaccinationTerm {
     private LocalDateTime vaccinationDate;
     private LocalDateTime creationDate;
     @ManyToOne
-    private VaccinationFacility vaccinationFacility;
+    private FacilityEntity facilityEntity;
 }

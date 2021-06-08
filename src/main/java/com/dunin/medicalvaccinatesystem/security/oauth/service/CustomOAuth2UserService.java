@@ -1,6 +1,6 @@
 package com.dunin.medicalvaccinatesystem.security.oauth.service;
 
-import com.dunin.medicalvaccinatesystem.dao.user.service.UserService;
+import com.dunin.medicalvaccinatesystem.buissnessService.UserService;
 import com.dunin.medicalvaccinatesystem.model.roles.Roles;
 import com.dunin.medicalvaccinatesystem.security.oauth.model.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;

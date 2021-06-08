@@ -1,9 +1,9 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.repo;
 
-import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinationFacility;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.model.FacilityEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VaccinationFacilityRepo extends JpaRepository<VaccinationFacility, Long> {
+public interface VaccinationFacilityRepo extends JpaRepository<FacilityEntity, Long> {
 }

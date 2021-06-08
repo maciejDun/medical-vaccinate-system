@@ -1,13 +1,16 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.model;
 
-import lombok.Data;
+import lombok.*;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "vaccination_facility")
 @Data
-public class VaccinationFacility {
+@NoArgsConstructor
+@AllArgsConstructor
+@Builder
+public class FacilityEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)

@@ -1,7 +1,7 @@
-package com.dunin.medicalvaccinatesystem.dao.user.service;
+package com.dunin.medicalvaccinatesystem.buissnessService;
 
+import com.dunin.medicalvaccinatesystem.dao.user.UserDao;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
-import com.dunin.medicalvaccinatesystem.dao.user.repo.UserRepository;
 import com.dunin.medicalvaccinatesystem.model.roles.Roles;
 import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeExtractor;
 import lombok.RequiredArgsConstructor;
@@ -13,20 +13,19 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
 
-    private final UserRepository userRepository;
     private final OAuth2AttributeExtractor oAuth2AttributeExtractor;
+    private final UserDao userDao;
+
     private String username;
 
     public boolean processOAuthPostLogin() {
         getUsername();
-        Optional<UserEntity> userExists = getUserOptional(this.username);
+
+        Optional<UserEntity> userExists = userDao.getUserEntityOptional(this.username);
 
         if (userExists.isEmpty()) {
-            UserEntity user = new UserEntity();
-            user.setUserName(username);
-            user.setRoles(Roles.ROLE_USER);
-
-            userRepository.save(user);
+            UserEntity user = getNewUserEntity();
+            userDao.saveUserEntity(user);
 
             return false;
         } else {
@@ -34,8 +33,11 @@ public class UserService {
         }
     }
 
-    private Optional<UserEntity> getUserOptional(String username) {
-        return userRepository.findByUserName(username);
+    private UserEntity getNewUserEntity() {
+        UserEntity user = new UserEntity();
+        user.setUserName(this.username);
+        user.setRoles(Roles.ROLE_USER);
+        return user;
     }
 
     public boolean checkIfAdmin(Optional<UserEntity> userExists) {
@@ -44,18 +46,13 @@ public class UserService {
     }
 
     public UserEntity getCurrentUserEntity() {
-        return getUserOptional(getUsername())
-                .orElseThrow(() -> new RuntimeException("User not found"));
+        return userDao.getUserEntity(getUsername());
     }
 
     public String getUsername() {
         this.username = oAuth2AttributeExtractor.getEmail();
         return this.username;
     }
-    //todo add UserDao class to separate layers
-    //todo check if term is already taken
-    //todo check if user is already registered
-    //todo unregister user function
-    //todo admin manage terms (delete, update, delete reserved terms)
+
 }
 
