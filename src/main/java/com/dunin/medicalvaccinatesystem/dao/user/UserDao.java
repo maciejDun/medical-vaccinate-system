@@ -13,8 +13,12 @@ import java.util.Optional;
 public class UserDao {
     private final UserRepository userRepository;
 
-    public UserEntity getUserEntity(String username) {
+    public UserEntity getUserEntityByUsername(String username) {
         return userRepository.findByUserName(username).orElseThrow(() -> new UserNotFoundException("User not found"));
+    }
+
+    public UserEntity getUserEntityById(Long userId) {
+        return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
     public void saveUserEntity(UserEntity userEntity) {

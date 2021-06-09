@@ -33,20 +33,13 @@ public class UserService {
         }
     }
 
-    private UserEntity getNewUserEntity() {
-        UserEntity user = new UserEntity();
-        user.setUserName(this.username);
-        user.setRoles(Roles.ROLE_USER);
-        return user;
-    }
-
     public boolean checkIfAdmin(Optional<UserEntity> userExists) {
         Roles role = userExists.get().getRoles();
         return (role.equals(Roles.ROLE_ADMIN));
     }
 
     public UserEntity getCurrentUserEntity() {
-        return userDao.getUserEntity(getUsername());
+        return userDao.getUserEntityByUsername(getUsername());
     }
 
     public String getUsername() {
@@ -54,5 +47,15 @@ public class UserService {
         return this.username;
     }
 
+    public UserEntity getUserEntityById(Long userId) {
+        return userDao.getUserEntityById(userId);
+    }
+
+    private UserEntity getNewUserEntity() {
+        UserEntity user = new UserEntity();
+        user.setUserName(this.username);
+        user.setRoles(Roles.ROLE_USER);
+        return user;
+    }
 }
 

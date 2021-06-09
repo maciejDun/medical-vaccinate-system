@@ -4,11 +4,10 @@ import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyTakenExcepti
 import com.dunin.medicalvaccinatesystem.common.exception.TermNotFoundException;
 import com.dunin.medicalvaccinatesystem.common.exception.UserAlreadyRegisteredException;
 import com.dunin.medicalvaccinatesystem.common.exception.VaccinatedUserNotFoundException;
-import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.TermEntity;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinatedUserRepo;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinationTermRepo;
-import com.dunin.medicalvaccinatesystem.model.restModel.VaccinatedUser;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -58,6 +57,14 @@ public class VaccinationDao {
         }
     }
 
+    public List<VaccinatedUserEntity> getAllVaccinatedUsers() {
+        return vaccinatedUserRepo.findAll();
+    }
+
+    public VaccinatedUserEntity addVaccinatedUser(VaccinatedUserEntity vaccinatedUserEntity) {
+        return vaccinatedUserRepo.save(vaccinatedUserEntity);
+    }
+
     private VaccinatedUserEntity findVaccinatedUserByEntityIdOrException(Long entityId) {
         return findVaccinatedUserByEntityId(entityId).orElseThrow(
                 () -> new VaccinatedUserNotFoundException("Vaccinated user does not exist"));
@@ -84,11 +91,4 @@ public class VaccinationDao {
         return vaccinationTermRepo.findById(id);
     }
 
-    public List<VaccinatedUserEntity> getAllVaccinatedUsers() {
-        return vaccinatedUserRepo.findAll();
-    }
-
-    public VaccinatedUserEntity addVaccinatedUser(VaccinatedUserEntity vaccinatedUserEntity) {
-        return vaccinatedUserRepo.save(vaccinatedUserEntity);
-    }
 }
