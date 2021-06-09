@@ -4,8 +4,8 @@ import com.dunin.medicalvaccinatesystem.buissnessService.mapper.TermMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.VaccinatedUsersMapper;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.dao.VaccinationDao;
-import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.TermEntity;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.model.restModel.Term;
 import com.dunin.medicalvaccinatesystem.model.restModel.VaccinatedUser;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +39,7 @@ public class VaccinationService {
 
         checkIfCanRegister(termId, userId);
 
-        TermEntity termEntity = getVaccinationTermById(termId);
+        TermEntity termEntity = getVaccinationTermEntityById(termId);
         VaccinatedUserEntity vaccinatedUserEntity = getNewVaccinatedUser(userEntity, termEntity);
 
         return vaccinationDao.registerVaccUser(vaccinatedUserEntity);
@@ -58,18 +58,30 @@ public class VaccinationService {
 
     public List<VaccinatedUser> getAllVaccinatedUsers() {
         return vaccinationDao.getAllVaccinatedUsers().stream()
-                .map(vaccinatedUsersMapper::map)
-                .collect(Collectors.toList());
+                             .map(vaccinatedUsersMapper::map)
+                             .collect(Collectors.toList());
     }
     //todo admin manage terms (delete and create users?, create and delete term?)
 
-    public VaccinatedUser addVaccinatedUser(VaccinatedUser vaccinatedUser) {
-        VaccinatedUserEntity vaccinatedUserEntity = vaccinatedUsersMapper.map(vaccinatedUser);
+    public VaccinatedUser addVaccinatedUser(Long userId, Long termId) {
+
+        UserEntity userEntity = getUserEntityById(userId);
+        TermEntity termEntity = getVaccinationTermEntityById(termId);
+
+
+        VaccinatedUserEntity vaccinatedUserEntity = VaccinatedUserEntity.builder()
+                                                                        .userEntity(userEntity)
+                                                                        .termEntity(termEntity)
+                                                                        .build();
 
         return vaccinatedUsersMapper.map(vaccinationDao.addVaccinatedUser(vaccinatedUserEntity));
     }
 
-    private TermEntity getVaccinationTermById(Long termId) {
+    private UserEntity getUserEntityById(Long userId) {
+        return userService.getUserEntityById(userId);
+    }
+
+    private TermEntity getVaccinationTermEntityById(Long termId) {
         return vaccinationDao.getVaccinationTermById(termId);
     }
 

@@ -35,9 +35,8 @@ public class AdminController {
         return "Successfully deleted vaccinated user";
     }
 
-    @PostMapping
-    public VaccinatedUser createVaccinatedUser(@RequestBody VaccinatedUser vaccinatedUser) {
-        return vaccinationService.addVaccinatedUser(vaccinatedUser);
-        //todo
+    @PostMapping("/vaccinated-users")
+    public VaccinatedUser createVaccinatedUser(@RequestParam Long userId,@RequestParam Long termId) {
+        return vaccinationService.addVaccinatedUser(userId, termId);
     }
 }
