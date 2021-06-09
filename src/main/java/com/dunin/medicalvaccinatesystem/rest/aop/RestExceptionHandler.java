@@ -1,10 +1,16 @@
 package com.dunin.medicalvaccinatesystem.rest.aop;
 
+import com.dunin.medicalvaccinatesystem.common.FacilityNotExistException;
+import com.dunin.medicalvaccinatesystem.common.InappropriateRoleException;
+import com.dunin.medicalvaccinatesystem.common.TermAlreadyExistsException;
+import com.dunin.medicalvaccinatesystem.common.UserAlreadyExistsException;
 import com.dunin.medicalvaccinatesystem.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -22,8 +28,42 @@ public class RestExceptionHandler {
         return handleException(exception, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(TermAlreadyExistsException.class)
+    ResponseEntity<Problem> handleTermAlreadyExist(TermAlreadyExistsException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(FacilityNotExistException.class)
+    ResponseEntity<Problem> handleFacilityNotExist(FacilityNotExistException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     ResponseEntity<Problem> handleAlreadyRegistered(UserAlreadyRegisteredException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<Problem> handleUserNotFound(UserNotFoundException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    ResponseEntity<Problem> handleInappropriateRole() {
+        InappropriateRoleException inappropriateRoleException =
+                new InappropriateRoleException("Inappropriate format of data");
+        return handleException(inappropriateRoleException, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ResponseEntity<Problem> handleNotBlankUser() {
+        RuntimeException runtimeException = new RuntimeException("Fields cannot be empty");
+        return handleException(runtimeException, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserAlreadyExistsException.class)
+    ResponseEntity<Problem> handleUserAlreadyExist(UserAlreadyExistsException exception) {
         return handleException(exception, HttpStatus.FORBIDDEN);
     }
 

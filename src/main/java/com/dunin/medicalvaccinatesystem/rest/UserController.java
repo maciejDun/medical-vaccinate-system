@@ -26,7 +26,7 @@ public class UserController {
     }
 
     @GetMapping("terms")
-    public List<Term> returnTerms() {
+    public List<Term> getOneTerm() {
         return vaccinationService.getAllVaccinationTerms();
     }
 

@@ -1,17 +1,22 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.dao;
 
+import com.dunin.medicalvaccinatesystem.common.FacilityNotExistException;
+import com.dunin.medicalvaccinatesystem.common.TermAlreadyExistsException;
 import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyTakenException;
 import com.dunin.medicalvaccinatesystem.common.exception.TermNotFoundException;
 import com.dunin.medicalvaccinatesystem.common.exception.UserAlreadyRegisteredException;
 import com.dunin.medicalvaccinatesystem.common.exception.VaccinatedUserNotFoundException;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.model.FacilityEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.TermEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinatedUserRepo;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinationFacilityRepo;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinationTermRepo;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -20,6 +25,7 @@ import java.util.Optional;
 public class VaccinationDao {
     private final VaccinationTermRepo vaccinationTermRepo;
     private final VaccinatedUserRepo vaccinatedUserRepo;
+    private final VaccinationFacilityRepo vaccinationFacilityRepo;
 
     public List<TermEntity> getAllVaccinationTerms() {
         return vaccinationTermRepo.findAll();
@@ -41,7 +47,7 @@ public class VaccinationDao {
     }
 
     public void unregisterUserById(Long entityId) {
-        VaccinatedUserEntity vaccinatedUserEntity = findVaccinatedUserByEntityIdOrException(entityId);
+        VaccinatedUserEntity vaccinatedUserEntity = getUserForAdminUnregistrationOrException(entityId);
         vaccinatedUserRepo.delete(vaccinatedUserEntity);
     }
 
@@ -53,7 +59,13 @@ public class VaccinationDao {
 
     public void checkIfUserAlreadyRegistered(Long userId) {
         if (vaccinatedUserRepo.existsByUserEntityId(userId)) {
-            throw new UserAlreadyRegisteredException("You have been already registered to another term");
+            throw new UserAlreadyRegisteredException("User already registered to another term");
+        }
+    }
+
+    public void checkIfUserIsInVaccinatedUserTable(Long userId) {
+        if (vaccinatedUserRepo.existsByUserEntityId(userId)) {
+            throw new UserAlreadyRegisteredException("Cant delete user, because FK of user exists in another table ");
         }
     }
 
@@ -65,18 +77,46 @@ public class VaccinationDao {
         return vaccinatedUserRepo.save(vaccinatedUserEntity);
     }
 
-    private VaccinatedUserEntity findVaccinatedUserByEntityIdOrException(Long entityId) {
-        return findVaccinatedUserByEntityId(entityId).orElseThrow(
-                () -> new VaccinatedUserNotFoundException("Vaccinated user does not exist"));
+    public void deleteTermById(Long termId) {
+        findVaccinationTermOrException(termId);
+        vaccinationTermRepo.deleteById(termId);
     }
 
-    private Optional<VaccinatedUserEntity> findVaccinatedUserByEntityId(Long entityId) {
-        return vaccinatedUserRepo.findById(entityId);
+    public TermEntity addTermEntity(TermEntity termEntity) {
+        return vaccinationTermRepo.save(termEntity);
+    }
+
+    public void checkIfTermAlreadyExists(LocalDateTime date, Long facilityId) {
+        boolean termExists = vaccinationTermRepo.existsByVaccinationDateAndFacilityEntityId(date, facilityId);
+        if (termExists){
+            throw new TermAlreadyExistsException("Cannot create term: term already exist");
+        }
+    }
+
+    public FacilityEntity getFacilityEntityById(Long facilityId) {
+        return findFacilityOrException(facilityId);
+    }
+
+    private FacilityEntity findFacilityOrException(Long facilityId) {
+        return findFacilityById(facilityId).orElseThrow(() -> new FacilityNotExistException("Facility does not exist"));
+    }
+
+    private VaccinatedUserEntity getUserForAdminUnregistrationOrException(Long entityId) {
+        return findVaccinatedUserByEntityId(entityId).orElseThrow(
+                () -> new VaccinatedUserNotFoundException("Vaccinated user does not exist"));
     }
 
     private VaccinatedUserEntity findVaccinatedUserOrException(Long userId) {
         return findVaccinatedUser(userId).orElseThrow(
                 () -> new VaccinatedUserNotFoundException("You haven't been registered already"));
+    }
+
+    private Optional<FacilityEntity> findFacilityById(Long facilityId) {
+        return vaccinationFacilityRepo.findById(facilityId);
+    }
+
+    private Optional<VaccinatedUserEntity> findVaccinatedUserByEntityId(Long entityId) {
+        return vaccinatedUserRepo.findById(entityId);
     }
 
     private TermEntity findVaccinationTermOrException(Long id) {
@@ -90,5 +130,4 @@ public class VaccinationDao {
     private Optional<TermEntity> getTermById(Long id) {
         return vaccinationTermRepo.findById(id);
     }
-
 }
