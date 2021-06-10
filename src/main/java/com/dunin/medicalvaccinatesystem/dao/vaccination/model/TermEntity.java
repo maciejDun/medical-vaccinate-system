@@ -20,6 +20,7 @@ public class TermEntity {
     @Column(columnDefinition = "bigserial", updatable = false, insertable = false)
     private Long id;
     private LocalDateTime vaccinationDate;
+    @Column(insertable = false)
     private LocalDateTime creationDate;
     @ManyToOne
     private FacilityEntity facilityEntity;

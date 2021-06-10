@@ -18,5 +18,5 @@ public class FacilityEntity {
     private String country;
     private String state;
     private String city;
-    private String streetAndNumber;
+    private String address;
 }

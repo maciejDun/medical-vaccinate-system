@@ -7,6 +7,7 @@ import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeEx
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -33,22 +34,40 @@ public class UserService {
         }
     }
 
-    public boolean checkIfAdmin(Optional<UserEntity> userExists) {
-        Roles role = userExists.get().getRoles();
-        return (role.equals(Roles.ROLE_ADMIN));
-    }
-
-    public UserEntity getCurrentUserEntity() {
+    public UserEntity getLoggedInUserEntity() {
         return userDao.getUserEntityByUsername(getUsername());
-    }
-
-    public String getUsername() {
-        this.username = oAuth2AttributeExtractor.getEmail();
-        return this.username;
     }
 
     public UserEntity getUserEntityById(Long userId) {
         return userDao.getUserEntityById(userId);
+    }
+
+    public List<UserEntity> getUsers() {
+        return userDao.getUsers();
+    }
+
+    public void deleteUserByID(Long userId) {
+        UserEntity userEntity = userDao.getUserEntityById(userId);
+        userDao.deleteUser(userEntity);
+    }
+
+    public UserEntity addUserEntity(UserEntity userEntity) {
+        checkIfUsernameExists(userEntity.getUserName());
+        return userDao.addUserEntity(userEntity);
+    }
+
+    private String getUsername() {
+        this.username = oAuth2AttributeExtractor.getEmail();
+        return this.username;
+    }
+
+    private boolean checkIfAdmin(Optional<UserEntity> userExists) {
+        Roles role = userExists.get().getRoles();
+        return (role.equals(Roles.ROLE_ADMIN));
+    }
+
+    private void checkIfUsernameExists(String userName) {
+        userDao.checkIfExistsByUsername(userName);
     }
 
     private UserEntity getNewUserEntity() {

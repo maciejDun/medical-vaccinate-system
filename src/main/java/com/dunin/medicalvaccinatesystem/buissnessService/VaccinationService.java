@@ -1,16 +1,19 @@
 package com.dunin.medicalvaccinatesystem.buissnessService;
 
+import com.dunin.medicalvaccinatesystem.buissnessService.mapper.FacilityMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.TermMapper;
+import com.dunin.medicalvaccinatesystem.buissnessService.mapper.UserMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.VaccinatedUsersMapper;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.dao.VaccinationDao;
+import com.dunin.medicalvaccinatesystem.dao.vaccination.model.FacilityEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.TermEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
-import com.dunin.medicalvaccinatesystem.model.restModel.Term;
-import com.dunin.medicalvaccinatesystem.model.restModel.VaccinatedUser;
+import com.dunin.medicalvaccinatesystem.model.restModel.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -20,8 +23,11 @@ public class VaccinationService {
 
     private final VaccinationDao vaccinationDao;
     private final UserService userService;
+
     private final TermMapper termMapper = new TermMapper();
     private final VaccinatedUsersMapper vaccinatedUsersMapper = new VaccinatedUsersMapper();
+    private final UserMapper userMapper = new UserMapper();
+    private final FacilityMapper facilityMapper = new FacilityMapper();
 
     public List<Term> getAllVaccinationTerms() {
         return vaccinationDao.getAllVaccinationTerms().stream()
@@ -34,7 +40,7 @@ public class VaccinationService {
     }
 
     public VaccinatedUserEntity registerVaccUser(Long termId) {
-        UserEntity userEntity = userService.getCurrentUserEntity();
+        UserEntity userEntity = userService.getLoggedInUserEntity();
         Long userId = userEntity.getId();
 
         checkIfCanRegister(termId, userId);
@@ -46,7 +52,7 @@ public class VaccinationService {
     }
 
     public void unregisterUser() {
-        UserEntity userEntity = userService.getCurrentUserEntity();
+        UserEntity userEntity = userService.getLoggedInUserEntity();
         Long userId = userEntity.getId();
 
         vaccinationDao.unregisterUser(userId);
@@ -61,20 +67,98 @@ public class VaccinationService {
                              .map(vaccinatedUsersMapper::map)
                              .collect(Collectors.toList());
     }
-    //todo admin manage terms (delete and create users?, create and delete term?)
 
     public VaccinatedUser addVaccinatedUser(Long userId, Long termId) {
+        checkIfTermIsTaken(termId);
+        checkIfUserAlreadyRegistered(userId);
 
         UserEntity userEntity = getUserEntityById(userId);
         TermEntity termEntity = getVaccinationTermEntityById(termId);
 
+        VaccinatedUserEntity vaccinatedUserEntity =
+                vaccinatedUsersMapper.buildVaccinatedUserEntity(userEntity, termEntity);
 
-        VaccinatedUserEntity vaccinatedUserEntity = VaccinatedUserEntity.builder()
-                                                                        .userEntity(userEntity)
-                                                                        .termEntity(termEntity)
-                                                                        .build();
+        VaccinatedUser vaccinatedUser =
+                vaccinatedUsersMapper.map(vaccinationDao.addVaccinatedUser(vaccinatedUserEntity));
+        return vaccinatedUser;
+    }
 
-        return vaccinatedUsersMapper.map(vaccinationDao.addVaccinatedUser(vaccinatedUserEntity));
+    public List<User> getUsers() {
+        return userService.getUsers().stream()
+                          .map(userMapper::map)
+                          .collect(Collectors.toList());
+    }
+
+    public void deleteUserById(Long userId) {
+        vaccinationDao.checkIfUserIsInVaccinatedUserTable(userId);
+        userService.deleteUserByID(userId);
+    }
+
+    public User addUser(User user) {
+        UserEntity userEntity = UserEntity.builder()
+                                          .userName(user.getUserName())
+                                          .roles(user.getRoles())
+                                          .build();
+        return userMapper.map(userService.addUserEntity(userEntity));
+    }
+
+    public void deleteTermById(Long termId) {
+        vaccinationDao.deleteTermById(termId);
+    }
+
+    public Term addTerm(TermUpsert term) {
+        Long facilityId = term.getFacilityId();
+
+        checkIfTermAlreadyExist(term.getVaccinationDate(), term.getFacilityId());
+
+        FacilityEntity facilityEntity = vaccinationDao.getFacilityEntityById(facilityId);
+
+        TermEntity termEntity = TermEntity.builder()
+                                          .vaccinationDate(term.getVaccinationDate())
+                                          .facilityEntity(facilityEntity)
+                                          .build();
+
+        return termMapper.map(vaccinationDao.addTermEntity(termEntity));
+    }
+
+    public List<Facility> getFacilities() {
+        return vaccinationDao.getFacilities().stream()
+                             .map(facilityMapper::map)
+                             .collect(Collectors.toList());
+    }
+
+    public void deleteFacilityById(Long id) {
+        vaccinationDao.checkIfFacilityIsInTermTable(id);
+        vaccinationDao.deleteFacilityById(id);
+    }
+
+    public Facility addFacility(Facility facility) {
+
+        checkIfFacilityAlreadyExist(facility);
+
+        FacilityEntity facilityEntity = FacilityEntity.builder()
+                                                      .country(facility.getCountry())
+                                                      .state(facility.getState())
+                                                      .city(facility.getCity())
+                                                      .address(facility.getAddress())
+                                                      .build();
+
+
+        return facilityMapper.map(vaccinationDao.addFacilityEntity(facilityEntity));
+    }
+
+    private void checkIfFacilityAlreadyExist(Facility facility) {
+
+        String city = facility.getCity();
+        String country = facility.getCountry();
+        String state = facility.getState();
+        String address = facility.getAddress();
+
+        vaccinationDao.checkIfFacilityAlreadyExist(city, country, state, address);
+    }
+
+    private void checkIfTermAlreadyExist(LocalDateTime date, Long facilityId) {
+        vaccinationDao.checkIfTermAlreadyExists(date, facilityId);
     }
 
     private UserEntity getUserEntityById(Long userId) {
