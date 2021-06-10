@@ -1,9 +1,6 @@
 package com.dunin.medicalvaccinatesystem.rest.aop;
 
-import com.dunin.medicalvaccinatesystem.common.FacilityNotExistException;
-import com.dunin.medicalvaccinatesystem.common.InappropriateRoleException;
-import com.dunin.medicalvaccinatesystem.common.TermAlreadyExistsException;
-import com.dunin.medicalvaccinatesystem.common.UserAlreadyExistsException;
+import com.dunin.medicalvaccinatesystem.common.*;
 import com.dunin.medicalvaccinatesystem.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -38,6 +35,16 @@ public class RestExceptionHandler {
         return handleException(exception, HttpStatus.FORBIDDEN);
     }
 
+    @ExceptionHandler(FKOfFacilityExistInAnotherTableException.class)
+    ResponseEntity<Problem> handleFKOfFacilityExist(FKOfFacilityExistInAnotherTableException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(FacilityAlreadyExistException.class)
+    ResponseEntity<Problem> handleFacilityAlreadyExist(FacilityAlreadyExistException exception) {
+        return handleException(exception, HttpStatus.FORBIDDEN);
+    }
+
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     ResponseEntity<Problem> handleAlreadyRegistered(UserAlreadyRegisteredException exception) {
         return handleException(exception, HttpStatus.FORBIDDEN);
@@ -50,16 +57,16 @@ public class RestExceptionHandler {
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    ResponseEntity<Problem> handleInappropriateRole() {
-        InappropriateRoleException inappropriateRoleException =
-                new InappropriateRoleException("Inappropriate format of data");
-        return handleException(inappropriateRoleException, HttpStatus.FORBIDDEN);
+    ResponseEntity<Problem> handleInappropriateRole(HttpMessageNotReadableException exception) {
+        InappropriateDataException inappropriateDataException =
+                new InappropriateDataException("Inappropriate format of data");
+        return handleException(inappropriateDataException, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    ResponseEntity<Problem> handleNotBlankUser() {
-        RuntimeException runtimeException = new RuntimeException("Fields cannot be empty");
-        return handleException(runtimeException, HttpStatus.FORBIDDEN);
+    ResponseEntity<Problem> handleNotBlankUser(MethodArgumentNotValidException exception) {
+        RuntimeException newException = getNewException(exception);
+        return handleException(newException, HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
@@ -76,13 +83,22 @@ public class RestExceptionHandler {
         log.error(exception.getMessage(), exception);
 
         Problem problem = Problem.builder()
-                .status(httpStatus.value())
-                .title(httpStatus.getReasonPhrase())
-                .detail(exception.getMessage())
-                .build();
+                                 .status(httpStatus.value())
+                                 .title(httpStatus.getReasonPhrase())
+                                 .detail(exception.getMessage())
+                                 .build();
 
         return ResponseEntity.status(httpStatus)
                              .contentType(MediaType.APPLICATION_PROBLEM_JSON)
                              .body(problem);
+    }
+
+    private String getDefaultMessage(MethodArgumentNotValidException exception) {
+        return exception.getBindingResult().getFieldError().getDefaultMessage();
+    }
+
+    private RuntimeException getNewException(MethodArgumentNotValidException exception) {
+        String message = getDefaultMessage(exception);
+        return new RuntimeException(message);
     }
 }

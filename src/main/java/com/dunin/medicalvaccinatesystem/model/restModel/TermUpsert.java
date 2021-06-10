@@ -11,8 +11,8 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Builder
 public class TermUpsert {
-    @NotNull
+    @NotNull(message = "Vaccination date cannot be blank")
     private LocalDateTime vaccinationDate;
-    @NotNull
+    @NotNull(message = "Facility cannot be blank")
     private Long facilityId;
 }

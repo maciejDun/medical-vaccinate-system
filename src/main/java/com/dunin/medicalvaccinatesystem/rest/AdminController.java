@@ -1,10 +1,7 @@
 package com.dunin.medicalvaccinatesystem.rest;
 
 import com.dunin.medicalvaccinatesystem.buissnessService.VaccinationService;
-import com.dunin.medicalvaccinatesystem.model.restModel.Term;
-import com.dunin.medicalvaccinatesystem.model.restModel.TermUpsert;
-import com.dunin.medicalvaccinatesystem.model.restModel.User;
-import com.dunin.medicalvaccinatesystem.model.restModel.VaccinatedUser;
+import com.dunin.medicalvaccinatesystem.model.restModel.*;
 import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeExtractor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
@@ -67,7 +64,25 @@ public class AdminController {
     }
 
     @PostMapping("/vaccinated-users")
-    public VaccinatedUser createVaccinatedUser(@RequestParam Long userId,@RequestParam Long termId) {
+    public VaccinatedUser addVaccinatedUser(@RequestParam Long userId,@RequestParam Long termId) {
         return vaccinationService.addVaccinatedUser(userId, termId);
     }
+
+    @GetMapping("/facility")
+    public List<Facility> getFacilities() {
+        return vaccinationService.getFacilities();
+    }
+
+    @DeleteMapping("/facility/{id}")
+    public String deleteFacility(@PathVariable Long id) {
+        vaccinationService.deleteFacilityById(id);
+        return "Successfully deleted facility";
+    }
+
+    @PostMapping("/facility")
+    public Facility addFacility(@Valid @RequestBody Facility facility) {
+        return vaccinationService.addFacility(facility);
+    }
+
+
 }

@@ -1,5 +1,6 @@
 package com.dunin.medicalvaccinatesystem.buissnessService;
 
+import com.dunin.medicalvaccinatesystem.buissnessService.mapper.FacilityMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.TermMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.UserMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.VaccinatedUsersMapper;
@@ -8,10 +9,7 @@ import com.dunin.medicalvaccinatesystem.dao.vaccination.dao.VaccinationDao;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.FacilityEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.TermEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
-import com.dunin.medicalvaccinatesystem.model.restModel.Term;
-import com.dunin.medicalvaccinatesystem.model.restModel.TermUpsert;
-import com.dunin.medicalvaccinatesystem.model.restModel.User;
-import com.dunin.medicalvaccinatesystem.model.restModel.VaccinatedUser;
+import com.dunin.medicalvaccinatesystem.model.restModel.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,9 +23,11 @@ public class VaccinationService {
 
     private final VaccinationDao vaccinationDao;
     private final UserService userService;
+
     private final TermMapper termMapper = new TermMapper();
     private final VaccinatedUsersMapper vaccinatedUsersMapper = new VaccinatedUsersMapper();
     private final UserMapper userMapper = new UserMapper();
+    private final FacilityMapper facilityMapper = new FacilityMapper();
 
     public List<Term> getAllVaccinationTerms() {
         return vaccinationDao.getAllVaccinationTerms().stream()
@@ -119,6 +119,42 @@ public class VaccinationService {
                                           .build();
 
         return termMapper.map(vaccinationDao.addTermEntity(termEntity));
+    }
+
+    public List<Facility> getFacilities() {
+        return vaccinationDao.getFacilities().stream()
+                             .map(facilityMapper::map)
+                             .collect(Collectors.toList());
+    }
+
+    public void deleteFacilityById(Long id) {
+        vaccinationDao.checkIfFacilityIsInTermTable(id);
+        vaccinationDao.deleteFacilityById(id);
+    }
+
+    public Facility addFacility(Facility facility) {
+
+        checkIfFacilityAlreadyExist(facility);
+
+        FacilityEntity facilityEntity = FacilityEntity.builder()
+                                                      .country(facility.getCountry())
+                                                      .state(facility.getState())
+                                                      .city(facility.getCity())
+                                                      .address(facility.getAddress())
+                                                      .build();
+
+
+        return facilityMapper.map(vaccinationDao.addFacilityEntity(facilityEntity));
+    }
+
+    private void checkIfFacilityAlreadyExist(Facility facility) {
+
+        String city = facility.getCity();
+        String country = facility.getCountry();
+        String state = facility.getState();
+        String address = facility.getAddress();
+
+        vaccinationDao.checkIfFacilityAlreadyExist(city, country, state, address);
     }
 
     private void checkIfTermAlreadyExist(LocalDateTime date, Long facilityId) {

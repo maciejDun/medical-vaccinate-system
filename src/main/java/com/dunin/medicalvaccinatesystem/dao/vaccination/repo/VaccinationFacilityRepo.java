@@ -6,4 +6,6 @@ import org.springframework.stereotype.Repository;
 
 @Repository
 public interface VaccinationFacilityRepo extends JpaRepository<FacilityEntity, Long> {
+    boolean existsByCityAndCountryAndStateAndAddress(String city, String country, String state,
+                                                             String address);
 }

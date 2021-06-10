@@ -1,5 +1,7 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.dao;
 
+import com.dunin.medicalvaccinatesystem.common.FKOfFacilityExistInAnotherTableException;
+import com.dunin.medicalvaccinatesystem.common.FacilityAlreadyExistException;
 import com.dunin.medicalvaccinatesystem.common.FacilityNotExistException;
 import com.dunin.medicalvaccinatesystem.common.TermAlreadyExistsException;
 import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyTakenException;
@@ -88,16 +90,43 @@ public class VaccinationDao {
 
     public void checkIfTermAlreadyExists(LocalDateTime date, Long facilityId) {
         boolean termExists = vaccinationTermRepo.existsByVaccinationDateAndFacilityEntityId(date, facilityId);
-        if (termExists){
+        if (termExists) {
             throw new TermAlreadyExistsException("Cannot create term: term already exist");
         }
     }
 
     public FacilityEntity getFacilityEntityById(Long facilityId) {
-        return findFacilityOrException(facilityId);
+        return getFacilityOrException(facilityId);
     }
 
-    private FacilityEntity findFacilityOrException(Long facilityId) {
+    public List<FacilityEntity> getFacilities() {
+        return vaccinationFacilityRepo.findAll();
+    }
+
+    public void deleteFacilityById(Long id) {
+        FacilityEntity facilityEntity = getFacilityEntityById(id);
+        vaccinationFacilityRepo.delete(facilityEntity);
+    }
+
+    public void checkIfFacilityIsInTermTable(Long id) {
+        if (vaccinationTermRepo.existsByFacilityEntityId(id)) {
+            throw new FKOfFacilityExistInAnotherTableException("Cant delete facility," +
+                    " because FK of facility exists in another table ");
+        }
+    }
+
+    public void checkIfFacilityAlreadyExist(String city, String country, String state, String address) {
+        if (vaccinationFacilityRepo.existsByCityAndCountryAndStateAndAddress(city, country,
+                state, address)) {
+            throw new FacilityAlreadyExistException("Cannot create facility: facility already exist");
+        }
+    }
+
+    public FacilityEntity addFacilityEntity(FacilityEntity facilityEntity) {
+        return vaccinationFacilityRepo.save(facilityEntity);
+    }
+
+    private FacilityEntity getFacilityOrException(Long facilityId) {
         return findFacilityById(facilityId).orElseThrow(() -> new FacilityNotExistException("Facility does not exist"));
     }
 

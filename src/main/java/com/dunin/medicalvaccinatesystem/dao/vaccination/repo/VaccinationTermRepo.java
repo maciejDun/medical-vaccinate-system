@@ -9,5 +9,6 @@ import java.time.LocalDateTime;
 @Repository
 public interface VaccinationTermRepo extends JpaRepository<TermEntity, Long> {
     boolean existsByVaccinationDateAndFacilityEntityId(LocalDateTime date, Long facilityId);
+    boolean existsByFacilityEntityId(Long id);
 }
 

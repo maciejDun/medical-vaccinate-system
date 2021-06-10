@@ -14,8 +14,8 @@ import javax.validation.constraints.NotNull;
 @AllArgsConstructor
 public class User {
     private Long id;
-    @Email(message = "Email format is inappropriate")
+    @Email(message = "Email format is inappropriate or blank")
     private String userName;
-    @NotNull
+    @NotNull(message = "Role cannot be blank")
     private Roles roles;
 }

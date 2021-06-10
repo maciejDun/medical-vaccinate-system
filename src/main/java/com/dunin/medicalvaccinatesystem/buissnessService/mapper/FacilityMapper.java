@@ -10,7 +10,7 @@ public class FacilityMapper {
                        .country(facility.getCountry())
                        .state(facility.getState())
                        .city(facility.getCity())
-                       .streetAndNumber(facility.getStreetAndNumber())
+                       .address(facility.getAddress())
                        .build();
     }
 
@@ -20,7 +20,7 @@ public class FacilityMapper {
                 .country(facility.getCountry())
                 .state(facility.getState())
                 .city(facility.getCity())
-                .streetAndNumber(facility.getStreetAndNumber())
+                .address(facility.getAddress())
                 .build();
     }
 }
