@@ -1,9 +1,9 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.dao;
 
-import com.dunin.medicalvaccinatesystem.common.FKOfFacilityExistInAnotherTableException;
-import com.dunin.medicalvaccinatesystem.common.FacilityAlreadyExistException;
-import com.dunin.medicalvaccinatesystem.common.FacilityNotExistException;
-import com.dunin.medicalvaccinatesystem.common.TermAlreadyExistsException;
+import com.dunin.medicalvaccinatesystem.common.exception.FKOfFacilityExistInAnotherTableException;
+import com.dunin.medicalvaccinatesystem.common.exception.FacilityAlreadyExistException;
+import com.dunin.medicalvaccinatesystem.common.exception.FacilityNotExistException;
+import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyExistsException;
 import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyTakenException;
 import com.dunin.medicalvaccinatesystem.common.exception.TermNotFoundException;
 import com.dunin.medicalvaccinatesystem.common.exception.UserAlreadyRegisteredException;
@@ -53,6 +53,61 @@ public class VaccinationDao {
         vaccinatedUserRepo.delete(vaccinatedUserEntity);
     }
 
+    public List<VaccinatedUserEntity> getAllVaccinatedUsers() {
+        return vaccinatedUserRepo.findAll();
+    }
+
+    public VaccinatedUserEntity addVaccinatedUser(VaccinatedUserEntity vaccinatedUserEntity) {
+        return vaccinatedUserRepo.save(vaccinatedUserEntity);
+    }
+
+    public void deleteTermById(Long termId) {
+        findVaccinationTermOrException(termId);
+        vaccinationTermRepo.deleteById(termId);
+    }
+
+    public TermEntity addTermEntity(TermEntity termEntity) {
+        return vaccinationTermRepo.save(termEntity);
+    }
+
+    public FacilityEntity getFacilityEntityById(Long facilityId) {
+        return getFacilityOrException(facilityId);
+    }
+
+    public List<FacilityEntity> getFacilities() {
+        return vaccinationFacilityRepo.findAll();
+    }
+
+    public void deleteFacilityById(Long id) {
+        FacilityEntity facilityEntity = getFacilityEntityById(id);
+        vaccinationFacilityRepo.delete(facilityEntity);
+    }
+
+    public FacilityEntity addFacilityEntity(FacilityEntity facilityEntity) {
+        return vaccinationFacilityRepo.save(facilityEntity);
+    }
+
+    public void checkIfTermAlreadyExists(LocalDateTime date, Long facilityId) {
+        boolean termExists = vaccinationTermRepo.existsByVaccinationDateAndFacilityEntityId(date, facilityId);
+        if (termExists) {
+            throw new TermAlreadyExistsException("Cannot create term: term already exist");
+        }
+    }
+
+    public void checkIfFacilityIsInTermTable(Long id) {
+        if (vaccinationTermRepo.existsByFacilityEntityId(id)) {
+            throw new FKOfFacilityExistInAnotherTableException("Cant delete facility," +
+                    " because FK of facility exists in another table ");
+        }
+    }
+
+    public void checkIfFacilityAlreadyExist(String city, String country, String state, String address) {
+        if (vaccinationFacilityRepo.existsByCityAndCountryAndStateAndAddress(city, country,
+                state, address)) {
+            throw new FacilityAlreadyExistException("Cannot create facility: facility already exist");
+        }
+    }
+
     public void checkIfTermIsTaken(Long termId) {
         if (vaccinatedUserRepo.existsByTermEntityId(termId)) {
             throw new TermAlreadyTakenException("These term is already taken");
@@ -71,61 +126,6 @@ public class VaccinationDao {
         }
     }
 
-    public List<VaccinatedUserEntity> getAllVaccinatedUsers() {
-        return vaccinatedUserRepo.findAll();
-    }
-
-    public VaccinatedUserEntity addVaccinatedUser(VaccinatedUserEntity vaccinatedUserEntity) {
-        return vaccinatedUserRepo.save(vaccinatedUserEntity);
-    }
-
-    public void deleteTermById(Long termId) {
-        findVaccinationTermOrException(termId);
-        vaccinationTermRepo.deleteById(termId);
-    }
-
-    public TermEntity addTermEntity(TermEntity termEntity) {
-        return vaccinationTermRepo.save(termEntity);
-    }
-
-    public void checkIfTermAlreadyExists(LocalDateTime date, Long facilityId) {
-        boolean termExists = vaccinationTermRepo.existsByVaccinationDateAndFacilityEntityId(date, facilityId);
-        if (termExists) {
-            throw new TermAlreadyExistsException("Cannot create term: term already exist");
-        }
-    }
-
-    public FacilityEntity getFacilityEntityById(Long facilityId) {
-        return getFacilityOrException(facilityId);
-    }
-
-    public List<FacilityEntity> getFacilities() {
-        return vaccinationFacilityRepo.findAll();
-    }
-
-    public void deleteFacilityById(Long id) {
-        FacilityEntity facilityEntity = getFacilityEntityById(id);
-        vaccinationFacilityRepo.delete(facilityEntity);
-    }
-
-    public void checkIfFacilityIsInTermTable(Long id) {
-        if (vaccinationTermRepo.existsByFacilityEntityId(id)) {
-            throw new FKOfFacilityExistInAnotherTableException("Cant delete facility," +
-                    " because FK of facility exists in another table ");
-        }
-    }
-
-    public void checkIfFacilityAlreadyExist(String city, String country, String state, String address) {
-        if (vaccinationFacilityRepo.existsByCityAndCountryAndStateAndAddress(city, country,
-                state, address)) {
-            throw new FacilityAlreadyExistException("Cannot create facility: facility already exist");
-        }
-    }
-
-    public FacilityEntity addFacilityEntity(FacilityEntity facilityEntity) {
-        return vaccinationFacilityRepo.save(facilityEntity);
-    }
-
     private FacilityEntity getFacilityOrException(Long facilityId) {
         return findFacilityById(facilityId).orElseThrow(() -> new FacilityNotExistException("Facility does not exist"));
     }
@@ -140,16 +140,16 @@ public class VaccinationDao {
                 () -> new VaccinatedUserNotFoundException("You haven't been registered already"));
     }
 
+    private TermEntity findVaccinationTermOrException(Long id) {
+        return getTermById(id).orElseThrow(() -> new TermNotFoundException("Term not found"));
+    }
+
     private Optional<FacilityEntity> findFacilityById(Long facilityId) {
         return vaccinationFacilityRepo.findById(facilityId);
     }
 
     private Optional<VaccinatedUserEntity> findVaccinatedUserByEntityId(Long entityId) {
         return vaccinatedUserRepo.findById(entityId);
-    }
-
-    private TermEntity findVaccinationTermOrException(Long id) {
-        return getTermById(id).orElseThrow(() -> new TermNotFoundException("Term not found"));
     }
 
     private Optional<VaccinatedUserEntity> findVaccinatedUser(Long userId) {

@@ -48,7 +48,8 @@ public class VaccinationService {
         TermEntity termEntity = getVaccinationTermEntityById(termId);
         VaccinatedUserEntity vaccinatedUserEntity = getNewVaccinatedUser(userEntity, termEntity);
 
-        return vaccinationDao.registerVaccUser(vaccinatedUserEntity);
+        VaccinatedUserEntity savedVaccinatedUserEntity = vaccinationDao.registerVaccUser(vaccinatedUserEntity);
+        return savedVaccinatedUserEntity;
     }
 
     public void unregisterUser() {
@@ -78,9 +79,10 @@ public class VaccinationService {
         VaccinatedUserEntity vaccinatedUserEntity =
                 vaccinatedUsersMapper.buildVaccinatedUserEntity(userEntity, termEntity);
 
-        VaccinatedUser vaccinatedUser =
-                vaccinatedUsersMapper.map(vaccinationDao.addVaccinatedUser(vaccinatedUserEntity));
-        return vaccinatedUser;
+        VaccinatedUserEntity savedVaccinatedUserEntity = vaccinationDao.addVaccinatedUser(vaccinatedUserEntity);
+        VaccinatedUser mappedToVaccinatedUser =
+                vaccinatedUsersMapper.map(savedVaccinatedUserEntity);
+        return mappedToVaccinatedUser;
     }
 
     public List<User> getUsers() {
@@ -95,11 +97,11 @@ public class VaccinationService {
     }
 
     public User addUser(User user) {
-        UserEntity userEntity = UserEntity.builder()
-                                          .userName(user.getUserName())
-                                          .roles(user.getRoles())
-                                          .build();
-        return userMapper.map(userService.addUserEntity(userEntity));
+        UserEntity userEntity = userMapper.map(user);
+
+        UserEntity savedUserEntity = userService.addUserEntity(userEntity);
+        User mappedToUser = userMapper.map(savedUserEntity);
+        return mappedToUser;
     }
 
     public void deleteTermById(Long termId) {
@@ -113,12 +115,11 @@ public class VaccinationService {
 
         FacilityEntity facilityEntity = vaccinationDao.getFacilityEntityById(facilityId);
 
-        TermEntity termEntity = TermEntity.builder()
-                                          .vaccinationDate(term.getVaccinationDate())
-                                          .facilityEntity(facilityEntity)
-                                          .build();
+        TermEntity termEntity = termMapper.map(term, facilityEntity);
 
-        return termMapper.map(vaccinationDao.addTermEntity(termEntity));
+        TermEntity savedTermEntity = vaccinationDao.addTermEntity(termEntity);
+        Term mappedToTerm = termMapper.map(savedTermEntity);
+        return mappedToTerm;
     }
 
     public List<Facility> getFacilities() {
@@ -133,32 +134,13 @@ public class VaccinationService {
     }
 
     public Facility addFacility(Facility facility) {
-
         checkIfFacilityAlreadyExist(facility);
 
-        FacilityEntity facilityEntity = FacilityEntity.builder()
-                                                      .country(facility.getCountry())
-                                                      .state(facility.getState())
-                                                      .city(facility.getCity())
-                                                      .address(facility.getAddress())
-                                                      .build();
+        FacilityEntity facilityEntity = facilityMapper.map(facility);
 
-
-        return facilityMapper.map(vaccinationDao.addFacilityEntity(facilityEntity));
-    }
-
-    private void checkIfFacilityAlreadyExist(Facility facility) {
-
-        String city = facility.getCity();
-        String country = facility.getCountry();
-        String state = facility.getState();
-        String address = facility.getAddress();
-
-        vaccinationDao.checkIfFacilityAlreadyExist(city, country, state, address);
-    }
-
-    private void checkIfTermAlreadyExist(LocalDateTime date, Long facilityId) {
-        vaccinationDao.checkIfTermAlreadyExists(date, facilityId);
+        FacilityEntity savedFacilityEntity = vaccinationDao.addFacilityEntity(facilityEntity);
+        Facility mappedToFacility = facilityMapper.map(savedFacilityEntity);
+        return mappedToFacility;
     }
 
     private UserEntity getUserEntityById(Long userId) {
@@ -174,6 +156,19 @@ public class VaccinationService {
         vaccinatedUserEntity.setUserEntity(userEntity);
         vaccinatedUserEntity.setTermEntity(termEntity);
         return vaccinatedUserEntity;
+    }
+
+    private void checkIfTermAlreadyExist(LocalDateTime date, Long facilityId) {
+        vaccinationDao.checkIfTermAlreadyExists(date, facilityId);
+    }
+
+    private void checkIfFacilityAlreadyExist(Facility facility) {
+        String city = facility.getCity();
+        String country = facility.getCountry();
+        String state = facility.getState();
+        String address = facility.getAddress();
+
+        vaccinationDao.checkIfFacilityAlreadyExist(city, country, state, address);
     }
 
     private void checkIfCanRegister(Long termId, Long userId) {

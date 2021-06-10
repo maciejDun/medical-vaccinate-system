@@ -1,10 +1,9 @@
 package com.dunin.medicalvaccinatesystem.dao.user;
 
-import com.dunin.medicalvaccinatesystem.common.UserAlreadyExistsException;
+import com.dunin.medicalvaccinatesystem.common.exception.UserAlreadyExistsException;
 import com.dunin.medicalvaccinatesystem.common.exception.UserNotFoundException;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.dao.user.repo.UserRepository;
-import com.dunin.medicalvaccinatesystem.model.restModel.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 
