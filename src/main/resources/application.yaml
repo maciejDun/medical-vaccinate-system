@@ -18,6 +18,8 @@ spring:
           lob:
             non_contextual_creation: true
     show-sql: true
+    hibernate:
+      ddl-auto: none
   jackson:
     default-property-inclusion: always
     serialization:
