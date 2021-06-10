@@ -1,15 +1,18 @@
 package com.dunin.medicalvaccinatesystem.rest.aop;
 
-import com.dunin.medicalvaccinatesystem.common.*;
 import com.dunin.medicalvaccinatesystem.common.exception.*;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+
+import java.util.Optional;
 
 @Slf4j
 @ControllerAdvice
@@ -94,7 +97,8 @@ public class RestExceptionHandler {
     }
 
     private String getDefaultMessage(MethodArgumentNotValidException exception) {
-        return exception.getBindingResult().getFieldError().getDefaultMessage();
+        Optional<FieldError> fieldError = Optional.ofNullable(exception.getBindingResult().getFieldError());
+        return fieldError.map(DefaultMessageSourceResolvable::getDefaultMessage).orElse(null);
     }
 
     private RuntimeException getNewException(MethodArgumentNotValidException exception) {
