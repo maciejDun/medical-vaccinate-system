@@ -25,9 +25,9 @@ public class UserController {
                 + oAuth2AttributeExtractor.getEmail();
     }
 
-    @GetMapping("terms")
-    public List<Term> getOneTerm() {
-        return vaccinationService.getAllVaccinationTerms();
+    @GetMapping("/terms")
+    public List<Term> getTerms() {
+        return vaccinationService.getAvailableVaccinationTerms();
     }
 
     @GetMapping("/terms/{termId}")

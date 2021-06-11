@@ -20,8 +20,8 @@ import java.util.stream.Collectors;
 @Service
 @RequiredArgsConstructor
 public class VaccinationService {
-
     private final VaccinationDao vaccinationDao;
+
     private final UserService userService;
 
     private final TermMapper termMapper = new TermMapper();
@@ -31,6 +31,12 @@ public class VaccinationService {
 
     public List<Term> getAllVaccinationTerms() {
         return vaccinationDao.getAllVaccinationTerms().stream()
+                             .map(termMapper::map)
+                             .collect(Collectors.toList());
+    }
+
+    public List<Term> getAvailableVaccinationTerms() {
+        return vaccinationDao.getAvailableVaccinationTerms().stream()
                              .map(termMapper::map)
                              .collect(Collectors.toList());
     }

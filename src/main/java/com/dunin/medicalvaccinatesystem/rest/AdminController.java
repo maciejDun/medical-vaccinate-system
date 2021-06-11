@@ -47,6 +47,11 @@ public class AdminController {
         return "Successfully deleted term";
     }
 
+    @GetMapping("/terms")
+    public List<Term> getTerms() {
+        return vaccinationService.getAllVaccinationTerms();
+    }
+
     @PostMapping("/terms")
     public Term addTerm(@Valid @RequestBody TermUpsert term) {
         return vaccinationService.addTerm(term);

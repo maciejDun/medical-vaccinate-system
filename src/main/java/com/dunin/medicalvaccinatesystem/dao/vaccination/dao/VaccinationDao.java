@@ -33,6 +33,10 @@ public class VaccinationDao {
         return vaccinationTermRepo.findAll();
     }
 
+    public List<TermEntity> getAvailableVaccinationTerms() {
+        return vaccinationTermRepo.findAvailableTerms();
+    }
+
     public TermEntity getVaccinationTermById(Long id) {
         return findVaccinationTermOrException(id);
     }
