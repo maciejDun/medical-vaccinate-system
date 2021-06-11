@@ -23,6 +23,8 @@ Admin users can:
     - delete facilities,
     - create facilities
 
+For clearer application understanding see CaseUses.png and EntityDiagram.png
+
 # Running the application
 
 This project expects a PostgreSQL database listening on port 5432.
