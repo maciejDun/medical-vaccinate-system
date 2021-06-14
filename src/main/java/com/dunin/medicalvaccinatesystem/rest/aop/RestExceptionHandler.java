@@ -35,7 +35,7 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(FacilityNotExistException.class)
     ResponseEntity<Problem> handleFacilityNotExist(FacilityNotExistException exception) {
-        return handleException(exception, HttpStatus.FORBIDDEN);
+        return handleException(exception, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(FKOfFacilityExistInAnotherTableException.class)
@@ -51,16 +51,15 @@ public class RestExceptionHandler {
     @ExceptionHandler(UserAlreadyRegisteredException.class)
     ResponseEntity<Problem> handleAlreadyRegistered(UserAlreadyRegisteredException exception) {
         return handleException(exception, HttpStatus.FORBIDDEN);
-
     }
 
     @ExceptionHandler(UserNotFoundException.class)
     ResponseEntity<Problem> handleUserNotFound(UserNotFoundException exception) {
-        return handleException(exception, HttpStatus.FORBIDDEN);
+        return handleException(exception, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(HttpMessageNotReadableException.class)
-    ResponseEntity<Problem> handleInappropriateRole(HttpMessageNotReadableException exception) {
+    ResponseEntity<Problem> handleInappropriateData(HttpMessageNotReadableException exception) {
         InappropriateDataException inappropriateDataException =
                 new InappropriateDataException("Inappropriate format of data");
         return handleException(inappropriateDataException, HttpStatus.FORBIDDEN);

@@ -23,8 +23,10 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
             .antMatchers("/oauth2/**", "/login**").permitAll()
-            .antMatchers("/admin/**").hasRole("ADMIN")
-            .antMatchers("/user/**").hasAnyRole("ADMIN", "USER")
+//            .antMatchers("/admin/**").hasRole("ADMIN") // disabled for Angular testing
+//            .antMatchers("/user/**").hasAnyRole("ADMIN", "USER") // disabled for Angular testing
+            .antMatchers("/admin/**").permitAll() //permitted for Angular testing
+            .antMatchers("/user/**").permitAll() //permitted for Angular testing
             .and()
             .oauth2Login()
             .userInfoEndpoint()
