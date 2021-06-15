@@ -1,6 +1,7 @@
 package com.dunin.medicalvaccinatesystem.security.oauth.service;
 
 import com.dunin.medicalvaccinatesystem.buissnessService.UserService;
+import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.model.roles.Roles;
 import com.dunin.medicalvaccinatesystem.security.oauth.model.CustomOAuth2User;
 import lombok.RequiredArgsConstructor;
@@ -31,11 +32,10 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
     }
 
     public void processOAuthPostLogin() {
-        checkIfAdmin();
-    }
-
-    public void checkIfAdmin() {
-        if (userService.processOAuthPostLogin()) grantAdminAuthorities();
+        UserEntity user = userService.createIfNotExist(userService.getUserEntityOptional());
+        if(userService.isAdmin(user)) {
+            grantAdminAuthorities();
+        }
     }
 
     private void grantAdminAuthorities() {

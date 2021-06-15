@@ -17,21 +17,17 @@ public class UserService {
     private final OAuth2AttributeExtractor oAuth2AttributeExtractor;
     private final UserDao userDao;
 
-    private String username;
 
-    public boolean processOAuthPostLogin() {
-        getUsername();
+    public boolean isAdmin(UserEntity user) {
+        return userHasAdminRole(user);
+    }
 
-        Optional<UserEntity> userExists = userDao.getUserEntityOptional(this.username);
+    public UserEntity createIfNotExist(Optional<UserEntity> user) {
+        return user.orElseGet(() -> createNewUserEntity(getUsername()));
+    }
 
-        if (userExists.isEmpty()) {
-            UserEntity user = getNewUserEntity();
-            userDao.saveUserEntity(user);
-
-            return false;
-        } else {
-            return checkIfAdmin(userExists);
-        }
+    public Optional<UserEntity> getUserEntityOptional() {
+        return userDao.getUserEntityOptional(getUsername());
     }
 
     public UserEntity getLoggedInUserEntity() {
@@ -57,12 +53,12 @@ public class UserService {
     }
 
     private String getUsername() {
-        this.username = oAuth2AttributeExtractor.getEmail();
-        return this.username;
+        String username = oAuth2AttributeExtractor.getEmail();
+        return username;
     }
 
-    private boolean checkIfAdmin(Optional<UserEntity> userExists) {
-        Roles role = userExists.get().getRoles();
+    private boolean userHasAdminRole(UserEntity user) {
+        Roles role = user.getRoles();
         return (role.equals(Roles.ROLE_ADMIN));
     }
 
@@ -70,10 +66,11 @@ public class UserService {
         userDao.checkIfExistsByUsername(userName);
     }
 
-    private UserEntity getNewUserEntity() {
+    private UserEntity createNewUserEntity(String username) {
         UserEntity user = new UserEntity();
-        user.setUserName(this.username);
+        user.setUserName(username);
         user.setRoles(Roles.ROLE_USER);
+        userDao.saveUserEntity(user);
         return user;
     }
 }
