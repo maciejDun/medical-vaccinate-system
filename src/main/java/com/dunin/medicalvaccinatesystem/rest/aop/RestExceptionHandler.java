@@ -58,6 +58,11 @@ public class RestExceptionHandler {
         return handleException(exception, HttpStatus.NOT_FOUND);
     }
 
+    @ExceptionHandler(RoleNotExist.class)
+    ResponseEntity<Problem> handleRoleNotFound(RoleNotExist exception) {
+        return handleException(exception, HttpStatus.NOT_FOUND);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     ResponseEntity<Problem> handleInappropriateData(HttpMessageNotReadableException exception) {
         InappropriateDataException inappropriateDataException =

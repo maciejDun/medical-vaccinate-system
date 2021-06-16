@@ -1,5 +1,6 @@
 package com.dunin.medicalvaccinatesystem.buissnessService;
 
+import com.dunin.medicalvaccinatesystem.dao.role.model.RoleEntity;
 import com.dunin.medicalvaccinatesystem.dao.user.UserDao;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.model.roles.Roles;
@@ -7,6 +8,7 @@ import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeEx
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -58,8 +60,9 @@ public class UserService {
     }
 
     private boolean userHasAdminRole(UserEntity user) {
-        Roles role = user.getRoles();
-        return (role.equals(Roles.ROLE_ADMIN));
+        List<RoleEntity> roles = user.getRoles();
+        RoleEntity roleAdmin = new RoleEntity(1L, Roles.ROLE_ADMIN);
+        return (roles.contains(roleAdmin));
     }
 
     private void checkIfUsernameExists(String userName) {
@@ -69,9 +72,16 @@ public class UserService {
     private UserEntity createNewUserEntity(String username) {
         UserEntity user = new UserEntity();
         user.setUserName(username);
-        user.setRoles(Roles.ROLE_USER);
+        user.setRoles(createRoleList());
         userDao.saveUserEntity(user);
         return user;
+    }
+
+    private List<RoleEntity> createRoleList() {
+        List<RoleEntity> roleList = new ArrayList<>();
+        RoleEntity roleUser = new RoleEntity(2L, Roles.ROLE_USER);
+        roleList.add(roleUser);
+        return roleList;
     }
 }
 

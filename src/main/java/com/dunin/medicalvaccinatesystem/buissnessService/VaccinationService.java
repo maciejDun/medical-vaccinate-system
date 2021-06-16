@@ -4,6 +4,7 @@ import com.dunin.medicalvaccinatesystem.buissnessService.mapper.FacilityMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.TermMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.UserMapper;
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.VaccinatedUsersMapper;
+import com.dunin.medicalvaccinatesystem.dao.role.model.RoleEntity;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.dao.VaccinationDao;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.FacilityEntity;
@@ -52,7 +53,7 @@ public class VaccinationService {
         checkIfCanRegister(termId, userId);
 
         TermEntity termEntity = getVaccinationTermEntityById(termId);
-        VaccinatedUserEntity vaccinatedUserEntity = getNewVaccinatedUser(userEntity, termEntity);
+        VaccinatedUserEntity vaccinatedUserEntity = createNewVaccinatedUser(userEntity, termEntity);
 
         VaccinatedUserEntity savedVaccinatedUserEntity = vaccinationDao.registerVaccUser(vaccinatedUserEntity);
         return savedVaccinatedUserEntity;
@@ -102,24 +103,25 @@ public class VaccinationService {
         userService.deleteUserByID(userId);
     }
 
-    public User addUser(User user) {
-        UserEntity userEntity = userMapper.map(user);
+    public User addUser(UserUpsert user) {
+        return mapToUser(getSavedUserEntity(user, getRole(user)));
+    }
 
-        UserEntity savedUserEntity = userService.addUserEntity(userEntity);
-        User mappedToUser = userMapper.map(savedUserEntity);
-        return mappedToUser;
+    private UserEntity getSavedUserEntity(UserUpsert user, RoleEntity roleEntity) {
+        return userService.addUserEntity(mapToUserEntity(user, roleEntity));
+    }
+
+    private RoleEntity getRole(UserUpsert user) {
+        return vaccinationDao.getRole(user.getRoleId());
     }
 
     public void deleteTermById(Long termId) {
         vaccinationDao.deleteTermById(termId);
     }
-
     public Term addTerm(TermUpsert term) {
-        Long facilityId = term.getFacilityId();
-
         checkIfTermAlreadyExist(term.getVaccinationDate(), term.getFacilityId());
 
-        FacilityEntity facilityEntity = vaccinationDao.getFacilityEntityById(facilityId);
+        FacilityEntity facilityEntity = vaccinationDao.getFacilityEntityById(term.getFacilityId());
 
         TermEntity termEntity = termMapper.map(term, facilityEntity);
 
@@ -149,6 +151,14 @@ public class VaccinationService {
         return mappedToFacility;
     }
 
+    private User mapToUser(UserEntity savedUserEntity) {
+        return userMapper.map(savedUserEntity);
+    }
+
+    private UserEntity mapToUserEntity(UserUpsert user, RoleEntity roleEntity) {
+        return userMapper.map(user, roleEntity);
+    }
+
     private UserEntity getUserEntityById(Long userId) {
         return userService.getUserEntityById(userId);
     }
@@ -157,7 +167,7 @@ public class VaccinationService {
         return vaccinationDao.getVaccinationTermById(termId);
     }
 
-    private VaccinatedUserEntity getNewVaccinatedUser(UserEntity userEntity, TermEntity termEntity) {
+    private VaccinatedUserEntity createNewVaccinatedUser(UserEntity userEntity, TermEntity termEntity) {
         VaccinatedUserEntity vaccinatedUserEntity = new VaccinatedUserEntity();
         vaccinatedUserEntity.setUserEntity(userEntity);
         vaccinatedUserEntity.setTermEntity(termEntity);

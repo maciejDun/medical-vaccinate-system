@@ -1,0 +1,6 @@
+CREATE TABLE role_entity
+(
+    id    BIGSERIAL PRIMARY KEY,
+    roles VARCHAR(20) UNIQUE NOT NULL
+);
+

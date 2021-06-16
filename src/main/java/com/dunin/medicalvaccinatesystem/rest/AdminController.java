@@ -37,7 +37,7 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public User addUser(@Valid @RequestBody User user){
+    public User addUser(@Valid @RequestBody UserUpsert user){
         return vaccinationService.addUser(user);
     }
 
