@@ -1,5 +1,6 @@
 package com.dunin.medicalvaccinatesystem.buissnessService;
 
+import com.dunin.medicalvaccinatesystem.dao.role.model.RoleEntity;
 import com.dunin.medicalvaccinatesystem.dao.user.UserDao;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.model.roles.Roles;
@@ -7,6 +8,7 @@ import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeEx
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -17,21 +19,17 @@ public class UserService {
     private final OAuth2AttributeExtractor oAuth2AttributeExtractor;
     private final UserDao userDao;
 
-    private String username;
 
-    public boolean processOAuthPostLogin() {
-        getUsername();
+    public boolean isAdmin(UserEntity user) {
+        return userHasAdminRole(user);
+    }
 
-        Optional<UserEntity> userExists = userDao.getUserEntityOptional(this.username);
+    public UserEntity createIfNotExist(Optional<UserEntity> user) {
+        return user.orElseGet(() -> createNewUserEntity(getUsername()));
+    }
 
-        if (userExists.isEmpty()) {
-            UserEntity user = getNewUserEntity();
-            userDao.saveUserEntity(user);
-
-            return false;
-        } else {
-            return checkIfAdmin(userExists);
-        }
+    public Optional<UserEntity> getUserEntityOptional() {
+        return userDao.getUserEntityOptional(getUsername());
     }
 
     public UserEntity getLoggedInUserEntity() {
@@ -57,24 +55,33 @@ public class UserService {
     }
 
     private String getUsername() {
-        this.username = oAuth2AttributeExtractor.getEmail();
-        return this.username;
+        String username = oAuth2AttributeExtractor.getEmail();
+        return username;
     }
 
-    private boolean checkIfAdmin(Optional<UserEntity> userExists) {
-        Roles role = userExists.get().getRoles();
-        return (role.equals(Roles.ROLE_ADMIN));
+    private boolean userHasAdminRole(UserEntity user) {
+        List<RoleEntity> roles = user.getRoles();
+        RoleEntity roleAdmin = new RoleEntity(1L, Roles.ROLE_ADMIN);
+        return (roles.contains(roleAdmin));
     }
 
     private void checkIfUsernameExists(String userName) {
         userDao.checkIfExistsByUsername(userName);
     }
 
-    private UserEntity getNewUserEntity() {
+    private UserEntity createNewUserEntity(String username) {
         UserEntity user = new UserEntity();
-        user.setUserName(this.username);
-        user.setRoles(Roles.ROLE_USER);
+        user.setUserName(username);
+        user.setRoles(createRoleList());
+        userDao.saveUserEntity(user);
         return user;
+    }
+
+    private List<RoleEntity> createRoleList() {
+        List<RoleEntity> roleList = new ArrayList<>();
+        RoleEntity roleUser = new RoleEntity(2L, Roles.ROLE_USER);
+        roleList.add(roleUser);
+        return roleList;
     }
 }
 

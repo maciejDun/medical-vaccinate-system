@@ -4,19 +4,19 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Getter;
 
-import javax.validation.constraints.NotNull;
+import javax.validation.constraints.NotBlank;
 
 @Getter
 @AllArgsConstructor
 @Builder
 public class Facility {
     private Long id;
-    @NotNull(message = "Country cannot be blank")
+    @NotBlank(message = "Country cannot be blank")
     private String country;
-    @NotNull(message = "State cannot be blank")
+    @NotBlank(message = "State cannot be blank")
     private String state;
-    @NotNull(message = "City cannot be blank")
+    @NotBlank(message = "City cannot be blank")
     private String city;
-    @NotNull(message = "Address cannot be blank")
+    @NotBlank(message = "Address cannot be blank")
     private String address;
 }

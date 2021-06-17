@@ -3,7 +3,8 @@ An application for saving vaccinate terms.
 Particular term has its creation and vaccination date and facility id.
 Facility has information about place of vaccination.
 
-Users can have role of regular user or admin.
+Users can have role of regular user or admin. Role are assigned depending on information stored in database.
+Every user of application login using Google account. Some of email addresses have role admin. 
 
 Regular users can:
     - search terms of vaccination,
@@ -22,6 +23,8 @@ Admin users can:
     - search facilities,
     - delete facilities,
     - create facilities
+
+For clearer application understanding see CaseUses.png and EntityDiagram.png
 
 # Running the application
 

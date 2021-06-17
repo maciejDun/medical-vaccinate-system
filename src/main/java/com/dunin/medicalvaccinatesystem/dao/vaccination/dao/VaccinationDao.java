@@ -1,13 +1,8 @@
 package com.dunin.medicalvaccinatesystem.dao.vaccination.dao;
 
-import com.dunin.medicalvaccinatesystem.common.exception.FKOfFacilityExistInAnotherTableException;
-import com.dunin.medicalvaccinatesystem.common.exception.FacilityAlreadyExistException;
-import com.dunin.medicalvaccinatesystem.common.exception.FacilityNotExistException;
-import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyExistsException;
-import com.dunin.medicalvaccinatesystem.common.exception.TermAlreadyTakenException;
-import com.dunin.medicalvaccinatesystem.common.exception.TermNotFoundException;
-import com.dunin.medicalvaccinatesystem.common.exception.UserAlreadyRegisteredException;
-import com.dunin.medicalvaccinatesystem.common.exception.VaccinatedUserNotFoundException;
+import com.dunin.medicalvaccinatesystem.common.exception.*;
+import com.dunin.medicalvaccinatesystem.dao.role.model.RoleEntity;
+import com.dunin.medicalvaccinatesystem.dao.role.repo.RoleRepo;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.FacilityEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.TermEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
@@ -28,9 +23,14 @@ public class VaccinationDao {
     private final VaccinationTermRepo vaccinationTermRepo;
     private final VaccinatedUserRepo vaccinatedUserRepo;
     private final VaccinationFacilityRepo vaccinationFacilityRepo;
+    private final RoleRepo roleRepo;
 
     public List<TermEntity> getAllVaccinationTerms() {
         return vaccinationTermRepo.findAll();
+    }
+
+    public List<TermEntity> getAvailableVaccinationTerms() {
+        return vaccinationTermRepo.findAvailableTerms();
     }
 
     public TermEntity getVaccinationTermById(Long id) {
@@ -124,6 +124,15 @@ public class VaccinationDao {
         if (vaccinatedUserRepo.existsByUserEntityId(userId)) {
             throw new UserAlreadyRegisteredException("Cant delete user, because FK of user exists in another table ");
         }
+    }
+
+    public List<RoleEntity> getRoles() {
+        return roleRepo.findAll();
+    }
+
+    public RoleEntity getRole(Long roleId) {
+        RoleEntity roleEntity = roleRepo.findById(roleId).orElseThrow(() -> new RoleNotExist("Role not exist"));
+        return roleEntity;
     }
 
     private FacilityEntity getFacilityOrException(Long facilityId) {

@@ -37,7 +37,7 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public User addUser(@Valid @RequestBody User user){
+    public User addUser(@Valid @RequestBody UserUpsert user){
         return vaccinationService.addUser(user);
     }
 
@@ -45,6 +45,11 @@ public class AdminController {
     public String deleteTerm(@PathVariable Long termId) {
         vaccinationService.deleteTermById(termId);
         return "Successfully deleted term";
+    }
+
+    @GetMapping("/terms")
+    public List<Term> getTerms() {
+        return vaccinationService.getAllVaccinationTerms();
     }
 
     @PostMapping("/terms")
