@@ -23,8 +23,8 @@ public class UserDao {
         return userRepository.findById(userId).orElseThrow(() -> new UserNotFoundException("User not found"));
     }
 
-    public void saveUserEntity(UserEntity userEntity) {
-        userRepository.save(userEntity);
+    public UserEntity saveUserEntity(UserEntity userEntity) {
+        return userRepository.save(userEntity);
     }
 
     public Optional<UserEntity> getUserEntityOptional(String username) {
@@ -48,9 +48,5 @@ public class UserDao {
         if (optional.isPresent()) {
             throw new UserAlreadyExistsException("Cant create: username already taken");
         }
-    }
-
-    public UserEntity addUserEntity(UserEntity userEntity) {
-        return userRepository.save(userEntity);
     }
 }

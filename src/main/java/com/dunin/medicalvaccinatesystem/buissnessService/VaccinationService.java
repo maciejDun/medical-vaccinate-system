@@ -112,8 +112,16 @@ public class VaccinationService {
         return mapToUser(getSavedUserEntity(user, getRole(user)));
     }
 
+    public User updateUser(UserUpsert user) {
+        return mapToUser(getUpdatedUserEntity(user, getRole(user)));
+    }
+
     private UserEntity getSavedUserEntity(UserUpsert user, RoleEntity roleEntity) {
         return userService.addUserEntity(mapToUserEntity(user, roleEntity));
+    }
+
+    private UserEntity getUpdatedUserEntity(UserUpsert user, RoleEntity roleEntity) {
+        return userService.updateUserEntity(mapToUpdateUserEntity(user, roleEntity));
     }
 
     private RoleEntity getRole(UserUpsert user) {
@@ -196,6 +204,10 @@ public class VaccinationService {
 
     private UserEntity mapToUserEntity(UserUpsert user, RoleEntity roleEntity) {
         return userMapper.map(user, roleEntity);
+    }
+
+    private UserEntity mapToUpdateUserEntity(UserUpsert user, RoleEntity roleEntity) {
+        return userMapper.mapToUpdate(user, roleEntity);
     }
 
     private UserEntity getUserEntityById(Long userId) {

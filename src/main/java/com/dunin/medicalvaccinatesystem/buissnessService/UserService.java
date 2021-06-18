@@ -51,7 +51,15 @@ public class UserService {
 
     public UserEntity addUserEntity(UserEntity userEntity) {
         checkIfUsernameExists(userEntity.getUserName());
-        return userDao.addUserEntity(userEntity);
+        return userDao.saveUserEntity(userEntity);
+    }
+
+    public UserEntity updateUserEntity(UserEntity userEntity) {
+        UserEntity userToUpdate = userDao.getUserEntityById(userEntity.getId());
+        userToUpdate.setUserName(userEntity.getUserName());
+        userToUpdate.setRoles(userEntity.getRoles());
+
+        return userDao.saveUserEntity(userToUpdate);
     }
 
     public List<UserEntity> getNotRegisteredUsers() {

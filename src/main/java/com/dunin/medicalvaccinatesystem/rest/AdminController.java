@@ -46,6 +46,11 @@ public class AdminController {
         return vaccinationService.addUser(user);
     }
 
+    @PutMapping("/users")
+    public User updateUser(@Valid @RequestBody UserUpsert user) {
+        return vaccinationService.updateUser(user);
+    }
+
     @GetMapping("/roles")
     public List<Role> getRoles() {
         return vaccinationService.getRoles();
