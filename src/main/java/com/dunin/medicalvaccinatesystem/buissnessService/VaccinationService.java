@@ -1,9 +1,6 @@
 package com.dunin.medicalvaccinatesystem.buissnessService;
 
-import com.dunin.medicalvaccinatesystem.buissnessService.mapper.FacilityMapper;
-import com.dunin.medicalvaccinatesystem.buissnessService.mapper.TermMapper;
-import com.dunin.medicalvaccinatesystem.buissnessService.mapper.UserMapper;
-import com.dunin.medicalvaccinatesystem.buissnessService.mapper.VaccinatedUsersMapper;
+import com.dunin.medicalvaccinatesystem.buissnessService.mapper.*;
 import com.dunin.medicalvaccinatesystem.dao.role.model.RoleEntity;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.dao.VaccinationDao;
@@ -29,6 +26,7 @@ public class VaccinationService {
     private final VaccinatedUsersMapper vaccinatedUsersMapper = new VaccinatedUsersMapper();
     private final UserMapper userMapper = new UserMapper();
     private final FacilityMapper facilityMapper = new FacilityMapper();
+    private final RoleMapper roleMapper = new RoleMapper();
 
     public List<Term> getAllVaccinationTerms() {
         return vaccinationDao.getAllVaccinationTerms().stream()
@@ -118,6 +116,7 @@ public class VaccinationService {
     public void deleteTermById(Long termId) {
         vaccinationDao.deleteTermById(termId);
     }
+
     public Term addTerm(TermUpsert term) {
         checkIfTermAlreadyExist(term.getVaccinationDate(), term.getFacilityId());
 
@@ -149,6 +148,18 @@ public class VaccinationService {
         FacilityEntity savedFacilityEntity = vaccinationDao.addFacilityEntity(facilityEntity);
         Facility mappedToFacility = facilityMapper.map(savedFacilityEntity);
         return mappedToFacility;
+    }
+
+    public List<Role> getRoles() {
+        return vaccinationDao.getRoles().stream()
+                             .map(roleMapper::map)
+                             .collect(Collectors.toList());
+    }
+
+    public List<User> getNotRegisteredUsers() {
+        return userService.getNotRegisteredUsers().stream()
+                          .map(userMapper::map)
+                          .collect(Collectors.toList());
     }
 
     private User mapToUser(UserEntity savedUserEntity) {

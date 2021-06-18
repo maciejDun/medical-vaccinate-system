@@ -7,6 +7,7 @@ public class RoleMapper {
 
     public Role map(RoleEntity roleEntity) {
         return Role.builder()
+                   .id(roleEntity.getId())
                    .roles(roleEntity.getRoles())
                    .build();
     }

@@ -54,6 +54,10 @@ public class UserService {
         return userDao.addUserEntity(userEntity);
     }
 
+    public List<UserEntity> getNotRegisteredUsers() {
+        return userDao.getNotRegisteredUsers();
+    }
+
     private String getUsername() {
         String username = oAuth2AttributeExtractor.getEmail();
         return username;

@@ -35,6 +35,10 @@ public class UserDao {
         return userRepository.findAll();
     }
 
+    public List<UserEntity> getNotRegisteredUsers() {
+        return userRepository.findAllNotRegisteredUsers();
+    }
+
     public void deleteUser(UserEntity userEntity) {
         userRepository.delete(userEntity);
     }

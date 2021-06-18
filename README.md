@@ -1,4 +1,4 @@
-# Welcome to medical-vaccinate-system
+# Welcome to Medical Vaccinate System
 An application for saving vaccinate terms.
 Particular term has its creation and vaccination date and facility id.
 Facility has information about place of vaccination.
