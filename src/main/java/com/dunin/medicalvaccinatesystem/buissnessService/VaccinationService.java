@@ -41,27 +41,27 @@ public class VaccinationService {
     }
 
     public Term returnOneTerm(Long termId) {
-        return termMapper.map(vaccinationDao.getVaccinationTermById(termId));
+        return mapToTerm(vaccinationDao.getVaccinationTermById(termId));
     }
 
+    //todo how can i separate responsibility
     public VaccinatedUserEntity registerVaccUser(Long termId) {
-        UserEntity userEntity = userService.getLoggedInUserEntity();
-        Long userId = userEntity.getId();
+        checkIfCanRegister(termId, getLoggedInId());
 
-        checkIfCanRegister(termId, userId);
+        return vaccinationDao.registerVaccUser(createNewVaccinatedUser(getLoggedInUserEntity(),
+                getVaccinationTermEntityById(termId)));
+    }
 
-        TermEntity termEntity = getVaccinationTermEntityById(termId);
-        VaccinatedUserEntity vaccinatedUserEntity = createNewVaccinatedUser(userEntity, termEntity);
-
-        VaccinatedUserEntity savedVaccinatedUserEntity = vaccinationDao.registerVaccUser(vaccinatedUserEntity);
-        return savedVaccinatedUserEntity;
+    private Long getLoggedInId() {
+        return getLoggedInUserEntity().getId();
     }
 
     public void unregisterUser() {
-        UserEntity userEntity = userService.getLoggedInUserEntity();
-        Long userId = userEntity.getId();
+        vaccinationDao.unregisterUser(getLoggedInId());
+    }
 
-        vaccinationDao.unregisterUser(userId);
+    private UserEntity getLoggedInUserEntity() {
+        return userService.getLoggedInUserEntity();
     }
 
     public void unregisterUser(Long vaccinatedUserId) {
@@ -78,16 +78,20 @@ public class VaccinationService {
         checkIfTermIsTaken(termId);
         checkIfUserAlreadyRegistered(userId);
 
-        UserEntity userEntity = getUserEntityById(userId);
-        TermEntity termEntity = getVaccinationTermEntityById(termId);
+        return mapToVaccinatedUser(addVaccinatedUserInDao
+                (getUserEntityById(userId), getVaccinationTermEntityById(termId)));
+    }
 
-        VaccinatedUserEntity vaccinatedUserEntity =
-                vaccinatedUsersMapper.buildVaccinatedUserEntity(userEntity, termEntity);
+    private VaccinatedUserEntity addVaccinatedUserInDao(UserEntity userEntity, TermEntity termEntity) {
+        return vaccinationDao.addVaccinatedUser(buildVaccinatedUserEntity(userEntity, termEntity));
+    }
 
-        VaccinatedUserEntity savedVaccinatedUserEntity = vaccinationDao.addVaccinatedUser(vaccinatedUserEntity);
-        VaccinatedUser mappedToVaccinatedUser =
-                vaccinatedUsersMapper.map(savedVaccinatedUserEntity);
-        return mappedToVaccinatedUser;
+    private VaccinatedUser mapToVaccinatedUser(VaccinatedUserEntity savedVaccinatedUserEntity) {
+        return vaccinatedUsersMapper.map(savedVaccinatedUserEntity);
+    }
+
+    private VaccinatedUserEntity buildVaccinatedUserEntity(UserEntity userEntity, TermEntity termEntity) {
+        return vaccinatedUsersMapper.buildVaccinatedUserEntity(userEntity, termEntity);
     }
 
     public List<User> getUsers() {
@@ -97,8 +101,11 @@ public class VaccinationService {
     }
 
     public void deleteUserById(Long userId) {
-        vaccinationDao.checkIfUserIsInVaccinatedUserTable(userId);
-        userService.deleteUserByID(userId);
+        userService.deleteUserByID(checkIfUserIsInVaccinatedUserTable(userId));
+    }
+
+    private Long checkIfUserIsInVaccinatedUserTable(Long userId) {
+        return vaccinationDao.checkIfUserIsInVaccinatedUserTable(userId);
     }
 
     public User addUser(UserUpsert user) {
@@ -120,13 +127,25 @@ public class VaccinationService {
     public Term addTerm(TermUpsert term) {
         checkIfTermAlreadyExist(term.getVaccinationDate(), term.getFacilityId());
 
-        FacilityEntity facilityEntity = vaccinationDao.getFacilityEntityById(term.getFacilityId());
+        FacilityEntity facilityEntity = getFacilityEntityById(term);
 
-        TermEntity termEntity = termMapper.map(term, facilityEntity);
+        return mapToTerm(addTermEntity(mapToTermEntity(term, facilityEntity)));
+    }
 
-        TermEntity savedTermEntity = vaccinationDao.addTermEntity(termEntity);
-        Term mappedToTerm = termMapper.map(savedTermEntity);
-        return mappedToTerm;
+    private FacilityEntity getFacilityEntityById(TermUpsert term) {
+        return vaccinationDao.getFacilityEntityById(term.getFacilityId());
+    }
+
+    private TermEntity mapToTermEntity(TermUpsert term, FacilityEntity facilityEntity) {
+        return termMapper.map(term, facilityEntity);
+    }
+
+    private TermEntity addTermEntity(TermEntity termEntity) {
+        return vaccinationDao.addTermEntity(termEntity);
+    }
+
+    private Term mapToTerm(TermEntity savedTermEntity) {
+        return termMapper.map(savedTermEntity);
     }
 
     public List<Facility> getFacilities() {
@@ -141,13 +160,22 @@ public class VaccinationService {
     }
 
     public Facility addFacility(Facility facility) {
-        checkIfFacilityAlreadyExist(facility);
+        FacilityEntity facilityEntity = checkIfFacilityAlreadyExist(facility);
 
-        FacilityEntity facilityEntity = facilityMapper.map(facility);
+        FacilityEntity savedFacilityEntity = addFacilityEntity(facilityEntity);
+        return mapToFacility(savedFacilityEntity);
+    }
 
-        FacilityEntity savedFacilityEntity = vaccinationDao.addFacilityEntity(facilityEntity);
-        Facility mappedToFacility = facilityMapper.map(savedFacilityEntity);
-        return mappedToFacility;
+    private FacilityEntity mapToFacilityEntity(Facility facility) {
+        return facilityMapper.map(facility);
+    }
+
+    private FacilityEntity addFacilityEntity(FacilityEntity facilityEntity) {
+        return vaccinationDao.addFacilityEntity(facilityEntity);
+    }
+
+    private Facility mapToFacility(FacilityEntity savedFacilityEntity) {
+        return facilityMapper.map(savedFacilityEntity);
     }
 
     public List<Role> getRoles() {
@@ -189,12 +217,18 @@ public class VaccinationService {
         vaccinationDao.checkIfTermAlreadyExists(date, facilityId);
     }
 
-    private void checkIfFacilityAlreadyExist(Facility facility) {
+    private FacilityEntity checkIfFacilityAlreadyExist(Facility facility) {
         String city = facility.getCity();
         String country = facility.getCountry();
         String state = facility.getState();
         String address = facility.getAddress();
 
+        checkIfFacilityAlreadyExist(city, country, state, address);
+
+        return mapToFacilityEntity(facility);
+    }
+
+    private void checkIfFacilityAlreadyExist(String city, String country, String state, String address) {
         vaccinationDao.checkIfFacilityAlreadyExist(city, country, state, address);
     }
 

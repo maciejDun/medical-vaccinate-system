@@ -120,10 +120,11 @@ public class VaccinationDao {
         }
     }
 
-    public void checkIfUserIsInVaccinatedUserTable(Long userId) {
+    public Long checkIfUserIsInVaccinatedUserTable(Long userId) {
         if (vaccinatedUserRepo.existsByUserEntityId(userId)) {
             throw new UserAlreadyRegisteredException("Cant delete user, because FK of user exists in another table ");
         }
+        return userId;
     }
 
     public List<RoleEntity> getRoles() {
