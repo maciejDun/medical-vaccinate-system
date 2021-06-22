@@ -11,6 +11,8 @@ import javax.validation.constraints.NotNull;
 @Getter
 @AllArgsConstructor
 public class UserUpsert {
+    @NotNull
+    private Long id;
     @Email(message = "Email format is inappropriate or blank")
     private String userName;
     @NotNull(message = "Role cannot be blank")

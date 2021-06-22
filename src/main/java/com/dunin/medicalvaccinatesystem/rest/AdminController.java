@@ -20,14 +20,19 @@ public class AdminController {
     private final VaccinationService vaccinationService;
 
     @GetMapping("")
-    public String returnAdmin() {
+    public String greetAdmin() {
         return "hello admin "
                 + oAuth2AttributeExtractor.getEmail();
     }
 
     @GetMapping("/users")
-    public List<User> returnUsers() {
+    public List<User> getUsers() {
         return vaccinationService.getUsers();
+    }
+
+    @GetMapping("/not-registered-users")
+    public List<User> getNotRegisteredUsers() {
+        return vaccinationService.getNotRegisteredUsers();
     }
 
     @DeleteMapping("/users/{userId}")
@@ -37,8 +42,18 @@ public class AdminController {
     }
 
     @PostMapping("/users")
-    public User addUser(@Valid @RequestBody UserUpsert user){
+    public User addUser(@Valid @RequestBody UserUpsert user) {
         return vaccinationService.addUser(user);
+    }
+
+    @PutMapping("/users")
+    public User updateUser(@Valid @RequestBody UserUpsert user) {
+        return vaccinationService.updateUser(user);
+    }
+
+    @GetMapping("/roles")
+    public List<Role> getRoles() {
+        return vaccinationService.getRoles();
     }
 
     @DeleteMapping("/terms/{termId}")
@@ -69,7 +84,7 @@ public class AdminController {
     }
 
     @PostMapping("/vaccinated-users")
-    public VaccinatedUser addVaccinatedUser(@RequestParam Long userId,@RequestParam Long termId) {
+    public VaccinatedUser addVaccinatedUser(@RequestParam Long userId, @RequestParam Long termId) {
         return vaccinationService.addVaccinatedUser(userId, termId);
     }
 

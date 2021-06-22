@@ -39,4 +39,12 @@ public class UserMapper {
         roles.add(role);
         return roles;
     }
+
+    public UserEntity mapToUpdate(UserUpsert user, RoleEntity roleEntity) {
+        return UserEntity.builder()
+                .id(user.getId())
+                .userName(user.getUserName())
+                .roles(getRoles(roleEntity))
+                .build();
+    }
 }
