@@ -7,15 +7,12 @@ import com.dunin.medicalvaccinatesystem.model.restModel.Term;
 import com.dunin.medicalvaccinatesystem.model.restModel.TermUpsert;
 
 public class TermMapper {
-
         public Term map(TermEntity termEntity) {
-
-        Facility facility = getFacility(termEntity);
 
         return Term.builder()
                    .id(termEntity.getId())
                    .vaccinationDate(termEntity.getVaccinationDate())
-                   .facility(facility)
+                   .facility(getFacility(termEntity))
                    .build();
     }
 
