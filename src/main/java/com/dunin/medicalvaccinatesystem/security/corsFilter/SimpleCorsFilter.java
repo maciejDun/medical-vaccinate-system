@@ -1,24 +1,20 @@
-package com.dunin.medicalvaccinatesystem.rest.corsFilter;
+package com.dunin.medicalvaccinatesystem.security.corsFilter;
 
-import java.io.IOException;
-import javax.servlet.Filter;
-import javax.servlet.FilterChain;
-import javax.servlet.FilterConfig;
-import javax.servlet.ServletException;
-import javax.servlet.ServletRequest;
-import javax.servlet.ServletResponse;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
+import javax.servlet.*;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
 @Component
-public class CorsFilter implements Filter {
+public class SimpleCorsFilter implements Filter {
 
-    private final Logger log = LoggerFactory.getLogger(CorsFilter.class);
+    private final Logger log = LoggerFactory.getLogger(SimpleCorsFilter.class);
 
-    public CorsFilter() {
+    public SimpleCorsFilter() {
         log.info("SimpleCORSFilter init");
     }
 

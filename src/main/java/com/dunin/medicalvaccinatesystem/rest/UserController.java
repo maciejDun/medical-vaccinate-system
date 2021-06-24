@@ -1,9 +1,8 @@
 package com.dunin.medicalvaccinatesystem.rest;
 
 import com.dunin.medicalvaccinatesystem.buissnessService.VaccinationService;
-import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEntity;
 import com.dunin.medicalvaccinatesystem.model.restModel.Term;
-import com.dunin.medicalvaccinatesystem.security.oauth.service.OAuth2AttributeExtractor;
+import com.dunin.medicalvaccinatesystem.model.restModel.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -16,13 +15,11 @@ public class UserController {
 
     static final String BASE_URL = "/user";
 
-    private final OAuth2AttributeExtractor oAuth2AttributeExtractor;
     private final VaccinationService vaccinationService;
 
     @GetMapping("")
-    public String returnWelcome() {
-        return "Hello you successfully logged in using Google account id: "
-                + oAuth2AttributeExtractor.getEmail();
+    public User returnUser() {
+        return vaccinationService.getLoggedInUser();
     }
 
     @GetMapping("/terms")
@@ -36,13 +33,12 @@ public class UserController {
     }
 
     @GetMapping("/terms/register/{termID}")
-    public VaccinatedUserEntity registerVaccUser(@PathVariable Long termID) {
+    public Term registerVaccUser(@PathVariable Long termID) {
         return vaccinationService.registerVaccUser(termID);
     }
 
     @DeleteMapping("/terms/unregister")
-    public String unregisterUser() {
+    public void unregisterUser() {
         vaccinationService.unregisterUser();
-        return "You have been successfully unregistered";
     }
 }

@@ -8,22 +8,16 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class OAuth2AttributeExtractor {
 
-    private Object principal;
-    private OAuth2User oAuth2User;
     private final SecurityContextService securityContextService;
 
 
     public String getEmail() {
-        getPrincipal();
-        return oAuth2User.getAttribute("email");
+        OAuth2User user = getPrincipal();
+        return user.getAttribute("email");
     }
 
-    private void getPrincipal() {
-        this.principal = securityContextService.getAuthentication().getPrincipal();
-        this.oAuth2User = (OAuth2User) principal;
-    }
-
-    public OAuth2User getOAuth2User() {
-        return this.oAuth2User;
+    private OAuth2User getPrincipal() {
+        Object principal = securityContextService.getAuthentication().getPrincipal();
+        return (OAuth2User) principal;
     }
 }

@@ -44,12 +44,13 @@ public class VaccinationService {
         return mapToTerm(vaccinationDao.getVaccinationTermById(termId));
     }
 
-    //todo how can i separate responsibility
-    public VaccinatedUserEntity registerVaccUser(Long termId) {
+    public Term registerVaccUser(Long termId) {
         checkIfCanRegister(termId, getLoggedInId());
 
-        return vaccinationDao.registerVaccUser(createNewVaccinatedUser(getLoggedInUserEntity(),
+        vaccinationDao.registerVaccUser(createNewVaccinatedUser(getLoggedInUserEntity(),
                 getVaccinationTermEntityById(termId)));
+
+        return returnOneTerm(termId);
     }
 
     private Long getLoggedInId() {
@@ -196,6 +197,10 @@ public class VaccinationService {
         return userService.getNotRegisteredUsers().stream()
                           .map(userMapper::map)
                           .collect(Collectors.toList());
+    }
+
+    public User getLoggedInUser() {
+        return mapToUser(getLoggedInUserEntity());
     }
 
     private User mapToUser(UserEntity savedUserEntity) {

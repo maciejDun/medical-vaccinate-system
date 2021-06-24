@@ -4,8 +4,9 @@ spring:
       client:
         registration:
           google:
-            client-id: 321715938529-d28hk3rco0qtbt9dj5prqlro0mtpuo1i.apps.googleusercontent.com
-            client-secret: OslwGiyTAQle-fRNZ-5LNxDn
+            client-id: 321715938529-dn4e8abollqh6g8mtaoucsu9tn6khb6n.apps.googleusercontent.com
+            client-secret: E6bRsPG3z4DMpc_DP3aHE6YB
+            redirectUri: http://localhost:4200/callback
   datasource:
     url: jdbc:postgresql://localhost:5432/vaccinate
     username: user

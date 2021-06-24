@@ -31,15 +31,15 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
         return new CustomOAuth2User(oAuth2User);
     }
 
-    public void processOAuthPostLogin() {
+    public Authentication processOAuthPostLogin(Authentication authentication) {
         UserEntity user = userService.createIfNotExist(userService.getUserEntityOptional());
-        if(userService.isAdmin(user)) {
-            grantAdminAuthorities();
+        if (userService.isAdmin(user)) {
+            return grantAdminAuthorities(authentication);
         }
+        return securityContextService.getAuthentication();
     }
 
-    private void grantAdminAuthorities() {
-        Authentication authentication = securityContextService.getAuthentication();
+    private Authentication grantAdminAuthorities(Authentication authentication) {
         List<GrantedAuthority> updatedAuthorities =
                 new ArrayList<>(authentication.getAuthorities());
 
@@ -49,5 +49,6 @@ public class CustomOAuth2UserService extends DefaultOAuth2UserService {
                 authentication.getCredentials(), updatedAuthorities);
 
         securityContextService.getContext().setAuthentication(newAuth);
+        return newAuth;
     }
 }
