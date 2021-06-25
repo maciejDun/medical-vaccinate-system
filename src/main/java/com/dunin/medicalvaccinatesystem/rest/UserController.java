@@ -18,8 +18,13 @@ public class UserController {
     private final VaccinationService vaccinationService;
 
     @GetMapping("")
-    public User returnUser() {
+    public User getUser() {
         return vaccinationService.getLoggedInUser();
+    }
+
+    @GetMapping("is-registered")
+    public Term getTermIfRegistered() {
+        return vaccinationService.getTermIfRegistered();
     }
 
     @GetMapping("/terms")
@@ -28,7 +33,7 @@ public class UserController {
     }
 
     @GetMapping("/terms/{termId}")
-    public Term returnOneTerm(@PathVariable Long termId) {
+    public Term getOneTerm(@PathVariable Long termId) {
         return vaccinationService.returnOneTerm(termId);
     }
 

@@ -1,6 +1,7 @@
 package com.dunin.medicalvaccinatesystem.buissnessService;
 
 import com.dunin.medicalvaccinatesystem.buissnessService.mapper.*;
+import com.dunin.medicalvaccinatesystem.common.exception.VaccinatedUserNotFoundException;
 import com.dunin.medicalvaccinatesystem.dao.role.model.RoleEntity;
 import com.dunin.medicalvaccinatesystem.dao.user.model.UserEntity;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.dao.VaccinationDao;
@@ -201,6 +202,16 @@ public class VaccinationService {
 
     public User getLoggedInUser() {
         return mapToUser(getLoggedInUserEntity());
+    }
+
+    public Term getTermIfRegistered() {
+        try {
+            VaccinatedUserEntity vaccinatedUser = vaccinationDao.findVaccinatedUserOrException(getLoggedInId());
+            TermEntity termEntity = vaccinatedUser.getTermEntity();
+            return mapToTerm(termEntity);
+        } catch (VaccinatedUserNotFoundException ex) {
+            return null;
+        }
     }
 
     private User mapToUser(UserEntity savedUserEntity) {

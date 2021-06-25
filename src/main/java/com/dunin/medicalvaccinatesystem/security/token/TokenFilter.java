@@ -1,6 +1,6 @@
 package com.dunin.medicalvaccinatesystem.security.token;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
@@ -13,14 +13,10 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class TokenFilter extends OncePerRequestFilter {
 
     private final TokenStore tokenStore;
-
-    @Autowired
-    public TokenFilter(TokenStore tokenStore) {
-        this.tokenStore = tokenStore;
-    }
 
     @Override
     protected void doFilterInternal(HttpServletRequest httpServletRequest,
