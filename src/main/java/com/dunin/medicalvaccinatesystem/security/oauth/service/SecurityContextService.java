@@ -8,16 +8,11 @@ import org.springframework.stereotype.Service;
 @Service
 public class SecurityContextService {
 
-    private SecurityContext context;
-    private Authentication authentication;
-
     public SecurityContext getContext() {
-            this.context = SecurityContextHolder.getContext();
-        return context;
+        return SecurityContextHolder.getContext();
     }
 
     public Authentication getAuthentication() {
-            this.authentication = getContext().getAuthentication();
-        return authentication;
+        return getContext().getAuthentication();
     }
 }

@@ -9,6 +9,7 @@ import com.dunin.medicalvaccinatesystem.dao.vaccination.model.VaccinatedUserEnti
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinatedUserRepo;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinationFacilityRepo;
 import com.dunin.medicalvaccinatesystem.dao.vaccination.repo.VaccinationTermRepo;
+import com.dunin.medicalvaccinatesystem.model.restModel.Term;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
@@ -136,6 +137,10 @@ public class VaccinationDao {
         return roleEntity;
     }
 
+    private Optional<VaccinatedUserEntity> getByUserEntityId(Long userId) {
+        return vaccinatedUserRepo.findByUserEntityId(userId);
+    }
+
     private FacilityEntity getFacilityOrException(Long facilityId) {
         return findFacilityById(facilityId).orElseThrow(() -> new FacilityNotExistException("Facility does not exist"));
     }
@@ -145,7 +150,7 @@ public class VaccinationDao {
                 () -> new VaccinatedUserNotFoundException("Vaccinated user does not exist"));
     }
 
-    private VaccinatedUserEntity findVaccinatedUserOrException(Long userId) {
+    public VaccinatedUserEntity findVaccinatedUserOrException(Long userId) {
         return findVaccinatedUser(userId).orElseThrow(
                 () -> new VaccinatedUserNotFoundException("You haven't been registered already"));
     }
