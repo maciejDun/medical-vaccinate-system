@@ -15,5 +15,5 @@ public class Role {
     Long id;
     @NotNull(message = "Roles cannot be blank")
     Roles roles;
-
+    String label;
 }
