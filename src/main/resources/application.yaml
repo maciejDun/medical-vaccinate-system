@@ -8,7 +8,7 @@ spring:
             client-secret: E6bRsPG3z4DMpc_DP3aHE6YB
             redirectUri: http://localhost:4200/callback
   datasource:
-    url: jdbc:postgresql://localhost:5432/vaccinate
+    url: jdbc:postgresql://db:5432/vaccinate
     username: user
     password: password
   jpa:
