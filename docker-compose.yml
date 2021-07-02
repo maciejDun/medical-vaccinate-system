@@ -3,7 +3,7 @@ version: '3.8'
 services:
   db:
     image: postgres
-    container_name: medical-vacinate-system-db
+    container_name: medical-vaccinate-system-db
     environment:
       - POSTGRES_USER=user
       - POSTGRES_PASSWORD=password
@@ -13,7 +13,7 @@ services:
       - ./database/initdb.d/init_schema.sql:/docker-entrypoint-initdb.d/init_schema.sql
   api:
     build: ./
-    container_name: medical-vacinate-system-api
+    container_name: medical-vaccinate-system-api
     ports:
       - 8080:8080
     environment:
