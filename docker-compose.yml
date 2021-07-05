@@ -17,7 +17,7 @@ services:
     ports:
       - 8080:8080
     environment:
-      - POSTGRES_URL=//db:5432/vaccinate
+      - POSTGRES_URL=//medical-vaccinate-system-db:5432/vaccinate
     depends_on:
       - db
   gui:
