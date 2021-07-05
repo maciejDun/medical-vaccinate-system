@@ -33,4 +33,6 @@ There is a docker-compose.yml that You should use for that purpose. Before that 
 containers on Your computer.
 To run it, simply execute: docker-compose up
 Using your favorite IDE, execute the main class: com.dunin.medicalvaccinatesystem.MediclaVaccinateSystemApplication
-After successfully deploying the application, open your browser and go to http://localhost:8080/
+This project also expects VaccinateSystemGui running on port 4200. 
+Get project from: https://github.com/maciejDun/vaccinate-system-gui
+After successfully deploying the application, open your browser and go to http://localhost:4200/home

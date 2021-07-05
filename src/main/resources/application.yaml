@@ -6,9 +6,9 @@ spring:
           google:
             client-id: 321715938529-dn4e8abollqh6g8mtaoucsu9tn6khb6n.apps.googleusercontent.com
             client-secret: E6bRsPG3z4DMpc_DP3aHE6YB
-            redirectUri: http://localhost:4200/callback
+            redirectUri: ${REDIRECT_URI}
   datasource:
-    url: jdbc:postgresql://localhost:5432/vaccinate
+    url: jdbc:postgresql:${POSTGRES_URL}
     username: user
     password: password
   jpa:
@@ -28,3 +28,6 @@ spring:
       write-dates-as-timestamps: false
   flyway:
     locations: classpath:/flyway
+
+POSTGRES_URL: //localhost:5432/vaccinate
+REDIRECT_URI: http://localhost:4200/callback
